@@ -1,4 +1,4 @@
-package com.example.comitserver.config;
+package com.example.comitserver.controller;
 
 import com.example.comitserver.dto.CustomUserDetails;
 import com.example.comitserver.dto.ServerResponseDTO;
