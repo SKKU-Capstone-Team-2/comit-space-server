@@ -22,4 +22,5 @@ public class StudyRequestDTO {
     private String description;
     private Boolean isRecruiting;
     private Semester semester;
+    private Integer year;
 }

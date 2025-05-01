@@ -56,6 +56,7 @@ public class StudyService {
         newStudy.setDescription(studyRequestDTO.getDescription());
         newStudy.setIsRecruiting(studyRequestDTO.getIsRecruiting());
         newStudy.setSemester(studyRequestDTO.getSemester());
+        newStudy.setYear(studyRequestDTO.getYear());
         studyRepository.save(newStudy);
 
         CreatedStudyEntity createdStudy = new CreatedStudyEntity();
@@ -81,6 +82,7 @@ public class StudyService {
         updatingStudy.setDescription(studyRequestDTO.getDescription());
         updatingStudy.setIsRecruiting(studyRequestDTO.getIsRecruiting());
         updatingStudy.setSemester(studyRequestDTO.getSemester());
+        updatingStudy.setYear(studyRequestDTO.getYear());
         studyRepository.save(updatingStudy);
 
         return updatingStudy;
