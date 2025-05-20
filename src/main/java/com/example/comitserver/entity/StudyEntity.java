@@ -10,12 +10,12 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-@Entity
+@Entity // 실제 entity임을 명시
 @Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true) // 🔥 이거 추가
+@EqualsAndHashCode(callSuper = true)
 public class StudyEntity extends GroupBaseEntity{
 
     @ManyToOne(fetch = FetchType.EAGER) // FetchType이 LAZY면 문제가 발생

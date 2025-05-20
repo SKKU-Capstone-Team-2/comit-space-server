@@ -5,6 +5,8 @@ import lombok.Data;
 
 @Data
 @Entity
+// study & user 관계를 기록하는 테이블을 위한 것임
+// study 생성 기록 추적 또는 내가 만든 스터디만 따로 조회할 때 유용함
 public class CreatedStudyEntity {
 
     @Id

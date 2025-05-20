@@ -1,5 +1,6 @@
 package com.example.comitserver.entity;
 
+import com.example.comitserver.entity.enumeration.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,7 +13,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-@EqualsAndHashCode(callSuper = true) // 🔥 추가
+@EqualsAndHashCode(callSuper = true)
 public class UserEntity extends BaseTimeEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

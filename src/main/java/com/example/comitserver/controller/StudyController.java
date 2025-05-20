@@ -38,7 +38,9 @@ public class StudyController {
     @GetMapping("/studies")
     public ResponseEntity<ServerResponseDTO> getStudies() {
         List<StudyEntity> allStudies = studyService.showAllStudies();
-        List<StudyResponseDTO> allStudiesDTO = allStudies.stream().map(entity -> modelMapper.map(entity, StudyResponseDTO.class)).collect(Collectors.toList());
+        List<StudyResponseDTO> allStudiesDTO = allStudies.stream()
+                .map(entity -> modelMapper.map(entity, StudyResponseDTO.class))
+                .collect(Collectors.toList());
 
         return ResponseUtil.createSuccessResponse(allStudiesDTO, HttpStatus.OK);
         //return ResponseEntity.ok(allStudiesDTO);
@@ -46,7 +48,8 @@ public class StudyController {
 
     @GetMapping("/studies/{id}")
     public ResponseEntity<ServerResponseDTO> getStudyById(@PathVariable Long id) {
-        if (studyRepository.findById(id).isEmpty()) return ResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND, "Study/CannotFindId", "study with that id not found");
+        if (studyRepository.findById(id).isEmpty())
+            return ResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND, "Study/CannotFindId", "study with that id not found");
 
         StudyEntity study = studyService.showStudy(id);
 
@@ -70,7 +73,8 @@ public class StudyController {
 
     @PutMapping("/studies/{id}")
     public ResponseEntity<ServerResponseDTO> putStudy(@PathVariable Long id, @RequestBody StudyRequestDTO studyRequestDTO, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        if (studyRepository.findById(id).isEmpty()) return ResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND, "Study/CannotFindId", "study with that id not found");
+        if (studyRepository.findById(id).isEmpty())
+            return ResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND, "Study/CannotFindId", "study with that id not found");
 
         if (studyService.identification(id, customUserDetails)) {
             StudyEntity updatedStudy = studyService.updateStudy(id, studyRequestDTO);
@@ -82,9 +86,9 @@ public class StudyController {
 
             return ResponseUtil.createSuccessResponse(modelMapper.map(updatedStudy, StudyResponseDTO.class), HttpStatus.OK);
             //return ResponseEntity.ok(modelMapper.map(updatedStudy, StudyResponseDTO.class));
-        }
-        else return ResponseUtil.createErrorResponse(HttpStatus.FORBIDDEN, "Study/PermissionDenied", "the user does not have permission to update this study");
-                //ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        } else
+            return ResponseUtil.createErrorResponse(HttpStatus.FORBIDDEN, "Study/PermissionDenied", "the user does not have permission to update this study");
+        //ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
 //    @DeleteMapping("/studies/{id}")
