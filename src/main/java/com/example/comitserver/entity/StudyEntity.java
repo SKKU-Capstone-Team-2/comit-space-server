@@ -10,7 +10,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-@Entity
+@Entity // 실제 entity임을 명시
 @Data
 @SuperBuilder
 @NoArgsConstructor

@@ -1,7 +1,7 @@
 package com.example.comitserver.controller;
 
 import com.example.comitserver.dto.AdminUserResponseDTO;
-import com.example.comitserver.entity.Role;
+import com.example.comitserver.entity.enumeration.Role;
 import com.example.comitserver.entity.UserEntity;
 import com.example.comitserver.service.UserAdminService;
 import com.example.comitserver.utils.ResponseUtil;

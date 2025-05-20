@@ -39,24 +39,13 @@ public class StudyService {
     }
 
     public StudyEntity createStudy(StudyRequestDTO studyRequestDTO, CustomUserDetails customUserDetails) {
+        // Create a new study and assign the current user as mentor
         StudyEntity newStudy = new StudyEntity();
 
-        newStudy.setTitle(studyRequestDTO.getTitle());
-        newStudy.setImageSrc(studyRequestDTO.getImageSrc());
-        // Get the mentor (user) from the repository using the user ID from the customUserDetails
         UserEntity mentor = userRepository.findById(customUserDetails.getUserId())
                 .orElseThrow(() -> new NoSuchElementException("User not found with id: " + customUserDetails.getUserId()));
         newStudy.setMentor(mentor);
-        newStudy.setDay(studyRequestDTO.getDay());
-        newStudy.setStartTime(studyRequestDTO.getStartTime());
-        newStudy.setEndTime(studyRequestDTO.getEndTime());
-        newStudy.setLevel(studyRequestDTO.getLevel());
-        newStudy.setTags(studyRequestDTO.getTags());
-        newStudy.setCampus(studyRequestDTO.getCampus());
-        newStudy.setDescription(studyRequestDTO.getDescription());
-        newStudy.setIsRecruiting(studyRequestDTO.getIsRecruiting());
-        newStudy.setSemester(studyRequestDTO.getSemester());
-        newStudy.setYear(studyRequestDTO.getYear());
+        fillStudyFields(newStudy, studyRequestDTO);
         studyRepository.save(newStudy);
 
         CreatedStudyEntity createdStudy = new CreatedStudyEntity();
@@ -65,27 +54,15 @@ public class StudyService {
         createdStudyRepository.save(createdStudy);
 
         return newStudy;
-
     }
 
     public StudyEntity updateStudy(Long id, StudyRequestDTO studyRequestDTO) {
-        StudyEntity updatingStudy = showStudy(id);
+        StudyEntity studyToUpdate = showStudy(id);
 
-        updatingStudy.setTitle(studyRequestDTO.getTitle());
-        updatingStudy.setImageSrc(studyRequestDTO.getImageSrc());
-        updatingStudy.setDay(studyRequestDTO.getDay());
-        updatingStudy.setStartTime(studyRequestDTO.getStartTime());
-        updatingStudy.setEndTime(studyRequestDTO.getEndTime());
-        updatingStudy.setLevel(studyRequestDTO.getLevel());
-        updatingStudy.setTags(studyRequestDTO.getTags());
-        updatingStudy.setCampus(studyRequestDTO.getCampus());
-        updatingStudy.setDescription(studyRequestDTO.getDescription());
-        updatingStudy.setIsRecruiting(studyRequestDTO.getIsRecruiting());
-        updatingStudy.setSemester(studyRequestDTO.getSemester());
-        updatingStudy.setYear(studyRequestDTO.getYear());
-        studyRepository.save(updatingStudy);
+        fillStudyFields(studyToUpdate, studyRequestDTO);
+        studyRepository.save(studyToUpdate);
 
-        return updatingStudy;
+        return studyToUpdate;
     }
 
     public void deleteStudy(Long id) {
@@ -99,5 +76,21 @@ public class StudyService {
         Long mentorId = study.getMentor().getId();
         Long requesterId = customUserDetails.getUserId();
         return Objects.equals(requesterId, mentorId);
+    }
+
+    private void fillStudyFields(StudyEntity study, StudyRequestDTO dto) {
+        // Fill in all study fields except for mentor
+        study.setTitle(dto.getTitle());
+        study.setImageSrc(dto.getImageSrc());
+        study.setDay(dto.getDay());
+        study.setStartTime(dto.getStartTime());
+        study.setEndTime(dto.getEndTime());
+        study.setLevel(dto.getLevel());
+        study.setTags(dto.getTags());
+        study.setCampus(dto.getCampus());
+        study.setDescription(dto.getDescription());
+        study.setIsRecruiting(dto.getIsRecruiting());
+        study.setSemester(dto.getSemester());
+        study.setYear(dto.getYear());
     }
 }
