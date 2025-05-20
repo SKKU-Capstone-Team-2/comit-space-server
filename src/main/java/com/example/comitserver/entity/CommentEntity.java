@@ -18,10 +18,10 @@ public class CommentEntity extends BaseTimeEntity {
     private Long id;
 
     @Column(nullable = false)
-    private Long PostId;
+    private Long postId;
 
     @Column(nullable = false)
-    private Long UserId;
+    private Long userId;
 
     @Column(nullable = false)
     private String content;
