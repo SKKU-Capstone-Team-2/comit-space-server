@@ -5,7 +5,6 @@ import com.example.comitserver.dto.CustomUserDetails;
 import com.example.comitserver.dto.PostRequestDTO;
 import com.example.comitserver.entity.PostEntity;
 import com.example.comitserver.entity.UserEntity;
-import com.example.comitserver.repository.CreatedStudyRepository;
 import com.example.comitserver.repository.PostRepository;
 import com.example.comitserver.repository.UserRepository;
 import org.springframework.stereotype.Service;
