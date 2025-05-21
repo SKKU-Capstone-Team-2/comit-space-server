@@ -53,17 +53,18 @@ public class StudyController {
 
         StudyEntity study = studyService.showStudy(id);
 
-        return ResponseUtil.createSuccessResponse(study, HttpStatus.OK);
+        return ResponseUtil.createSuccessResponse(modelMapper.map(study, StudyResponseDTO.class), HttpStatus.OK);
         //return ResponseEntity.ok(modelMapper.map(study, StudyResponseDTO.class));
     }
 
     @PostMapping("/studies")
-    public ResponseEntity<ServerResponseDTO> postStudy(@RequestBody StudyRequestDTO studyRequestDTO, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+    public ResponseEntity<ServerResponseDTO> postStudy(@RequestBody StudyRequestDTO studyRequestDTO,
+                                                       @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         StudyEntity newStudy = studyService.createStudy(studyRequestDTO, customUserDetails);
 
         URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{id}")
+                .fromCurrentRequest() // 현재 요청한 전체 URI(/api/studies) 기준으로
+                .path("/{id}") // /{id} 추가
                 .buildAndExpand(newStudy.getId())
                 .toUri();
 
@@ -72,7 +73,9 @@ public class StudyController {
     }
 
     @PutMapping("/studies/{id}")
-    public ResponseEntity<ServerResponseDTO> putStudy(@PathVariable Long id, @RequestBody StudyRequestDTO studyRequestDTO, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+    public ResponseEntity<ServerResponseDTO> putStudy(@PathVariable Long id,
+                                                      @RequestBody StudyRequestDTO studyRequestDTO,
+                                                      @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         if (studyRepository.findById(id).isEmpty())
             return ResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND, "Study/CannotFindId", "study with that id not found");
 
@@ -91,21 +94,22 @@ public class StudyController {
         //ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
-//    @DeleteMapping("/studies/{id}")
-//    public ResponseEntity<ServerResponseDTO> deleteStudy(@PathVariable Long id, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-//        if (studyRepository.findById(id).isEmpty()) return ResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND, "Study/CannotFindId", "study with that id not found");
-//
-//        if(studyService.identification(id, customUserDetails)) {
-//            StudyEntity deletedStudy = studyService.showStudy(id);
-//            StudyResponseDTO studyResponseDTO = modelMapper.map(deletedStudy, StudyResponseDTO.class);
-//
-//            studyService.deleteStudy(id);
-//
-//            return ResponseUtil.createSuccessResponse(studyResponseDTO, HttpStatus.OK);
-//            //return ResponseEntity.ok(studyResponseDTO);
-//        }
-//        else return ResponseUtil.createErrorResponse(HttpStatus.FORBIDDEN, "Study/PermissionDenied", "the user does not have permission to delete this study");
-//                //ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-//    }
+    @DeleteMapping("/studies/{id}")
+    public ResponseEntity<ServerResponseDTO> deleteStudy(@PathVariable Long id,
+                                                         @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        if (studyRepository.findById(id).isEmpty()) return ResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND, "Study/CannotFindId", "study with that id not found");
+
+        if(studyService.identification(id, customUserDetails)) {
+            StudyEntity deletedStudy = studyService.showStudy(id);
+            StudyResponseDTO studyResponseDTO = modelMapper.map(deletedStudy, StudyResponseDTO.class);
+
+            studyService.deleteStudy(id);
+
+            return ResponseUtil.createSuccessResponse(studyResponseDTO, HttpStatus.OK);
+            //return ResponseEntity.ok(studyResponseDTO);
+        }
+        else return ResponseUtil.createErrorResponse(HttpStatus.FORBIDDEN, "Study/PermissionDenied", "the user does not have permission to delete this study");
+                //ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    }
 
 }
