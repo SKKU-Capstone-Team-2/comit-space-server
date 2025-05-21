@@ -53,17 +53,18 @@ public class StudyController {
 
         StudyEntity study = studyService.showStudy(id);
 
-        return ResponseUtil.createSuccessResponse(study, HttpStatus.OK);
+        return ResponseUtil.createSuccessResponse(modelMapper.map(study, StudyResponseDTO.class), HttpStatus.OK);
         //return ResponseEntity.ok(modelMapper.map(study, StudyResponseDTO.class));
     }
 
     @PostMapping("/studies")
-    public ResponseEntity<ServerResponseDTO> postStudy(@RequestBody StudyRequestDTO studyRequestDTO, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+    public ResponseEntity<ServerResponseDTO> postStudy(@RequestBody StudyRequestDTO studyRequestDTO,
+                                                       @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         StudyEntity newStudy = studyService.createStudy(studyRequestDTO, customUserDetails);
 
         URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{id}")
+                .fromCurrentRequest() // 현재 요청한 전체 URI(/api/studies) 기준으로
+                .path("/{id}") // /{id} 추가
                 .buildAndExpand(newStudy.getId())
                 .toUri();
 
@@ -72,7 +73,9 @@ public class StudyController {
     }
 
     @PutMapping("/studies/{id}")
-    public ResponseEntity<ServerResponseDTO> putStudy(@PathVariable Long id, @RequestBody StudyRequestDTO studyRequestDTO, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+    public ResponseEntity<ServerResponseDTO> putStudy(@PathVariable Long id,
+                                                      @RequestBody StudyRequestDTO studyRequestDTO,
+                                                      @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         if (studyRepository.findById(id).isEmpty())
             return ResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND, "Study/CannotFindId", "study with that id not found");
 

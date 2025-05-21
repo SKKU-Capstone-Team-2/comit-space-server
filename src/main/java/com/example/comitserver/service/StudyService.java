@@ -71,6 +71,7 @@ public class StudyService {
         studyRepository.delete(deletingStudy);
     }
 
+    //
     public Boolean identification(Long id, CustomUserDetails customUserDetails) {
         StudyEntity study = showStudy(id);
         Long mentorId = study.getMentor().getId();

@@ -4,6 +4,9 @@ import com.example.comitserver.entity.enumeration.GroupType;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -39,4 +42,8 @@ public class PostEntity extends BaseTimeEntity {
 
     @Column(nullable = false)
     private int likeCount = 0;
+
+    @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CommentEntity> comments = new ArrayList<>();
+
 }
