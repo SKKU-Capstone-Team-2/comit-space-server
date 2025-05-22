@@ -105,7 +105,7 @@ public class PostController {
 
         if (postService.identification(id, customUserDetails)) {
             postService.deletePost(id);
-            return ResponseUtil.createSuccessResponse("Post deleted successfully", HttpStatus.NO_CONTENT);
+            return ResponseUtil.createSuccessResponse("Post deleted successfully", HttpStatus.OK);
         } else {
             return ResponseUtil.createErrorResponse(HttpStatus.FORBIDDEN, "Post/PermissionDenied", "the user does not have permission to delete this post");
         }
