@@ -28,14 +28,12 @@ public class CommentController {
     private final CommentService commentService;
     private final ModelMapper modelMapper;
     private final CommentRepository commentRepository;
-    private final UserRepository userRepository;
 
     @Autowired
-    public CommentController(CommentService commentService, ModelMapper modelMapper, CommentRepository commentRepository, UserRepository userRepository) {
+    public CommentController(CommentService commentService, ModelMapper modelMapper, CommentRepository commentRepository) {
         this.commentService = commentService;
         this.modelMapper = modelMapper;
         this.commentRepository = commentRepository;
-        this.userRepository = userRepository;
     }
 
     @PostMapping("posts/{postId}/comments")
@@ -45,15 +43,6 @@ public class CommentController {
         commentDTO.setPostId(postId);
         CommentEntity newComment = commentService.createComment(commentDTO, customUserDetails);
         return ResponseUtil.createSuccessResponse(modelMapper.map(newComment, CommentDTO.class), HttpStatus.CREATED);
-//        // modelMapper는 userId → author 로 자동 매핑해줄 수 없기 때문에, author 수동 설정
-//        CommentDTO responseDTO = modelMapper.map(newComment, CommentDTO.class); // CommentEntity에 userId, CommentDTO에 author
-//        UserEntity author = userRepository.findById(newComment.getUserId())
-//                .orElseThrow(() -> new NoSuchElementException("User not found with id: " + newComment.getUserId()));
-//
-//        UserResponseDTO authorDTO = modelMapper.map(author, UserResponseDTO.class);
-//        responseDTO.setAuthor(authorDTO);
-//
-//        return ResponseUtil.createSuccessResponse(responseDTO, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/comments/{id}")
