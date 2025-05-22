@@ -20,8 +20,11 @@ public class CommentEntity extends BaseTimeEntity {
     @Column(nullable = false)
     private Long postId;
 
-    @Column(nullable = false)
-    private Long userId;
+//    @Column(nullable = false)
+//    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private UserEntity author;
 
     @Column(nullable = false)
     private String content;

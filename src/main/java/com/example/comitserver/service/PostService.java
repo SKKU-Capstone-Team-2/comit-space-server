@@ -65,7 +65,7 @@ public class PostService {
 
     public void deletePost(Long id) {
         PostEntity postToDelete = showPost(id);
-        postRepository.deleteById(id);
+        postRepository.delete(postToDelete);
     }
 
     public Boolean identification(Long id, CustomUserDetails customUserDetails) {

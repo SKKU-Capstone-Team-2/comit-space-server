@@ -37,7 +37,8 @@ public class CommentService {
         UserEntity author = userRepository.findById(customUserDetails.getUserId())
                 .orElseThrow(()-> new NoSuchElementException("User not found with id: " + customUserDetails.getUserId()));
 
-        commentEntity.setUserId(author.getId());
+//        commentEntity.setUserId(author.getId());
+        commentEntity.setAuthor(author);
         commentEntity.setPostId(commentDTO.getPostId());
         commentEntity.setContent(commentDTO.getContent());
         commentRepository.save(commentEntity);
@@ -56,12 +57,13 @@ public class CommentService {
 
     public void deleteComment(Long id) {
         CommentEntity commentToDelete = showComment(id);
-        commentRepository.deleteById(id);
+        commentRepository.delete(commentToDelete);
     }
 
     public Boolean identification(Long id, CustomUserDetails customUserDetails) {
         CommentEntity comment = showComment(id);
-        Long authorId = comment.getUserId();
+//        Long authorId = comment.getUserId();
+        Long authorId = comment.getAuthor().getId();
         Long requesterId = customUserDetails.getUserId();
         return Objects.equals(requesterId, authorId);
     }
