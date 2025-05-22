@@ -30,7 +30,6 @@ public class PostController {
         this.postService = postService;
         this.modelMapper = modelMapper;
         this.postRepository = postRepository;
-
     }
 
     @GetMapping("/posts")
