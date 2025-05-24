@@ -51,6 +51,7 @@ public class StudyService {
         CreatedStudyEntity createdStudy = new CreatedStudyEntity();
         createdStudy.setUser(mentor);
         createdStudy.setStudy(newStudy);
+        createdStudy.setLeader(true);
         createdStudyRepository.save(createdStudy);
 
         return newStudy;
@@ -66,7 +67,7 @@ public class StudyService {
     }
 
     public void deleteStudy(Long id) {
-        createdStudyRepository.deleteByStudyId(id);
+        createdStudyRepository.deleteAllByStudyId(id);
         StudyEntity deletingStudy = showStudy(id);
         studyRepository.delete(deletingStudy);
     }
@@ -78,6 +79,42 @@ public class StudyService {
         Long requesterId = customUserDetails.getUserId();
         return Objects.equals(requesterId, mentorId);
     }
+
+    public Boolean checkStudyJoinAvailable(Long studyId, CustomUserDetails customUserDetails) {
+        Long requesterId = customUserDetails.getUserId();
+        boolean exists = createdStudyRepository.existsByStudyIdAndUserId(studyId, requesterId);
+
+        return !exists;
+    }
+
+    public void joinStudy(Long studyId, CustomUserDetails customUserDetails) {
+
+        UserEntity requestUser = userRepository.findById(customUserDetails.getUserId())
+                .orElseThrow(() -> new NoSuchElementException("User not found with id: " + customUserDetails.getUserId()));
+
+        CreatedStudyEntity createdStudy = new CreatedStudyEntity();
+        createdStudy.setUser(requestUser);
+        createdStudy.setStudy(showStudy(studyId));
+        createdStudy.setLeader(false);
+        createdStudyRepository.save(createdStudy);
+    }
+
+    public void leaveStudy(Long studyId, CustomUserDetails customUserDetails) {
+        Long userId = customUserDetails.getUserId();
+
+        // 탈퇴 요청자의 가입 정보를 CreatedStudyEntity에서 찾음
+        CreatedStudyEntity createdStudy = createdStudyRepository.findByStudyIdAndUserId(studyId, userId)
+                .orElseThrow(() -> new NoSuchElementException("The user is not a member of this study"));
+
+        // 스터디 리더는 스터디 탈퇴가 아닌 삭제만 가능
+        if (createdStudy.isLeader()) {
+            throw new IllegalStateException("Study leader cannot leave the study. please delete the study");
+        }
+
+        // 유효성 체크를 끝낸 후 해당 엔터티를 삭제
+        createdStudyRepository.delete(createdStudy);
+    }
+
 
     private void fillStudyFields(StudyEntity study, StudyRequestDTO dto) {
         // Fill in all study fields except for mentor
