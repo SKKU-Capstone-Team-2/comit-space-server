@@ -2,30 +2,26 @@ package com.example.comitserver.service;
 
 import com.example.comitserver.dto.CustomUserDetails;
 import com.example.comitserver.dto.EventRequestDTO;
-import com.example.comitserver.dto.StudyRequestDTO;
-import com.example.comitserver.entity.CreatedStudyEntity;
-import com.example.comitserver.entity.EventEntity;
-import com.example.comitserver.entity.StudyEntity;
-import com.example.comitserver.entity.UserEntity;
-import com.example.comitserver.repository.CreatedStudyRepository;
-import com.example.comitserver.repository.EventRepository;
-import com.example.comitserver.repository.StudyRepository;
-import com.example.comitserver.repository.UserRepository;
+import com.example.comitserver.entity.*;
+import com.example.comitserver.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 
 @Service
 @Transactional
 public class EventService {
 
     private final EventRepository eventRepository;
+    private final CreatedEventRepository createdEventRepository;
+    private final UserRepository userRepository;
 
-    public EventService(EventRepository eventRepository) {
+    public EventService(EventRepository eventRepository, CreatedEventRepository createdEventRepository, UserRepository userRepository) {
         this.eventRepository = eventRepository;
+        this.createdEventRepository = createdEventRepository;
+        this.userRepository = userRepository;
     }
 
     public List<EventEntity> showAllEvents() {
@@ -38,7 +34,6 @@ public class EventService {
     }
 
     public EventEntity createEvent(EventRequestDTO eventRequestDTO) {
-        // Create a new study and assign the current user as mentor
         EventEntity newEvent = new EventEntity();
 
         fillEventFields(newEvent, eventRequestDTO);
@@ -61,10 +56,34 @@ public class EventService {
         eventRepository.delete(deletingEvent);
     }
 
-    //
+    public Boolean checkEventJoinAvailable(Long eventId, CustomUserDetails customUserDetails) {
+        Long requesterId = customUserDetails.getUserId();
+        boolean exists = createdEventRepository.existsByEventIdAndUserId(eventId, requesterId);
+
+        return !exists;
+    }
+
+    public void joinEvent(Long eventId, CustomUserDetails customUserDetails) {
+
+        UserEntity requestUser = userRepository.findById(customUserDetails.getUserId())
+                .orElseThrow(() -> new NoSuchElementException("User not found with id: " + customUserDetails.getUserId()));
+
+        CreatedEventEntity createdEvent = new CreatedEventEntity();
+        createdEvent.setUser(requestUser);
+        createdEvent.setEvent(showEvent(eventId));
+        createdEventRepository.save(createdEvent);
+    }
+
+    public void leaveEvent(Long eventId, CustomUserDetails customUserDetails) {
+        Long userId = customUserDetails.getUserId();
+
+        CreatedEventEntity createdEvent = createdEventRepository.findByEventIdAndUserId(eventId, userId)
+                .orElseThrow(() -> new NoSuchElementException("The user is not a member of this event"));
+
+        createdEventRepository.delete(createdEvent);
+    }
 
     private void fillEventFields(EventEntity event, EventRequestDTO dto) {
-        // Fill in all study fields except for mentor
         event.setTitle(dto.getTitle());
         event.setImageSrc(dto.getImageSrc());
         event.setStartTime(dto.getStartTime());
