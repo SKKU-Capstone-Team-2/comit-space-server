@@ -86,6 +86,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/**").permitAll()
                 .requestMatchers(HttpMethod.PATCH, "/api/**").permitAll()
                 .requestMatchers(HttpMethod.PUT, "/api/**").permitAll()
+                .requestMatchers(HttpMethod.DELETE, "/api/**").hasAnyRole("ADMIN","VERIFIED")
                 // /admin 외의 POST 요청은 VERIFIED와 ADMIN만 접근 가능
                 .requestMatchers(HttpMethod.POST, "/api/**").hasAnyRole("ADMIN", "VERIFIED")
                 // 나머지 요청은 인증된 사용자만 접근 가능

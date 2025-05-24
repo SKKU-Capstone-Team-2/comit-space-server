@@ -2,6 +2,8 @@ package com.example.comitserver.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 
 @Data
 @Entity
@@ -20,4 +22,8 @@ public class CreatedStudyEntity {
     @ManyToOne
     @JoinColumn(name = "study_id", nullable = false)
     private StudyEntity study;
+
+    @Getter
+    @Column(nullable = false)
+    private boolean isLeader;
 }
