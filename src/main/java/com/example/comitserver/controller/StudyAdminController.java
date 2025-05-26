@@ -34,7 +34,9 @@ public class StudyAdminController {
     @GetMapping("/studies")
     public ResponseEntity<ServerResponseDTO> getStudies() {
         List<StudyEntity> allStudies = studyService.showAllStudies();
-        List<StudyResponseDTO> allStudiesDTO = allStudies.stream().map(entity -> modelMapper.map(entity, StudyResponseDTO.class)).collect(Collectors.toList());
+        List<StudyResponseDTO> allStudiesDTO = allStudies.stream()
+                .map(entity -> modelMapper.map(entity, StudyResponseDTO.class))
+                .collect(Collectors.toList());
 
         return ResponseUtil.createSuccessResponse(allStudiesDTO, HttpStatus.OK);
         //return ResponseEntity.ok(allStudiesDTO);
@@ -42,7 +44,8 @@ public class StudyAdminController {
 
     @GetMapping("/studies/{id}")
     public ResponseEntity<ServerResponseDTO> getStudyById(@PathVariable Long id) {
-        if (studyRepository.findById(id).isEmpty()) return ResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND, "Study/CannotFindId", "study with that id not found");
+        if (studyRepository.findById(id).isEmpty())
+            return ResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND, "Study/CannotFindId", "study with that id not found");
 
         StudyEntity study = studyService.showStudy(id);
 
@@ -51,9 +54,10 @@ public class StudyAdminController {
     }
 
     @PutMapping("/studies/{id}")
-    public ResponseEntity<ServerResponseDTO> putStudy(@PathVariable Long id, @RequestBody StudyRequestDTO studyRequestDTO) {
-        if (studyRepository.findById(id).isEmpty()) return ResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND, "Study/CannotFindId", "study with that id not found");
-
+    public ResponseEntity<ServerResponseDTO> putStudy(@PathVariable Long id,
+                                                      @RequestBody StudyRequestDTO studyRequestDTO) {
+        if (studyRepository.findById(id).isEmpty())
+            return ResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND, "Study/CannotFindId", "study with that id not found");
 
         StudyEntity updatedStudy = studyService.updateStudy(id, studyRequestDTO);
 
