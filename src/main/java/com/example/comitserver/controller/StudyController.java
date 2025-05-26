@@ -112,4 +112,49 @@ public class StudyController {
                 //ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
+    // 스터디 생성원이 아닌 다른 사용자가 스터디 가입
+    @PostMapping("/studies/{id}/join")
+    public ResponseEntity<ServerResponseDTO> joinStudy(@PathVariable Long id,
+                                                       @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+
+        if (studyRepository.findById(id).isEmpty()) return ResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND, "Study/CannotFindId", "study with that id not found");
+
+        if(studyService.checkStudyJoinAvailable(id, customUserDetails)){
+            studyService.joinStudy(id, customUserDetails);
+            StudyEntity joinStudy = studyService.showStudy(id);
+
+            URI location = ServletUriComponentsBuilder
+                    .fromCurrentContextPath() // 기본 경로를 root conte xt(/api)로 설정
+                    .path("/studies/{id}") // custom 경로 설정
+                    .buildAndExpand(joinStudy.getId())
+                    .toUri();
+
+            return ResponseUtil.createSuccessResponse(modelMapper.map(joinStudy, StudyResponseDTO.class), HttpStatus.CREATED, location);
+            //return ResponseEntity.created(location).body(modelMapper.map(newStudy, StudyResponseDTO.class));
+
+        }
+        else return ResponseUtil.createErrorResponse(HttpStatus.FORBIDDEN, "Study/alreadyJoined", "the user is already in this study");
+    }
+
+    @DeleteMapping("/studies/{id}/leave")
+    public ResponseEntity<ServerResponseDTO> leaveStudy(@PathVariable Long id,
+                                                        @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        // 스터디가 존재하지 않을 경우 처리
+        if (studyRepository.findById(id).isEmpty()) {
+            return ResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND, "Study/CannotFindId", "study with that id not found");
+        }
+
+        // 요청자가 해당 스터디에 가입되어 있는지 확인
+        boolean isMember = studyService.checkStudyJoinAvailable(id, customUserDetails); // 반대 동작을 재사용
+
+        if (!isMember) { // 스터디에 가입되어 있는 경우
+            studyService.leaveStudy(id, customUserDetails);
+            return ResponseUtil.createSuccessResponse("Successfully left the study", HttpStatus.OK);
+        } else {
+            return ResponseUtil.createErrorResponse(HttpStatus.FORBIDDEN, "Study/NotJoined", "the user is not a member of this study");
+        }
+    }
+
+
+
 }
