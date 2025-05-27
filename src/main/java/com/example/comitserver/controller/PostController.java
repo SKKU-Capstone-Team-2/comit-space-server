@@ -60,13 +60,16 @@ public class PostController {
         return ResponseUtil.createSuccessResponse(postsDTO, HttpStatus.OK);
     }
 
-    // group에 속한 사람만 생성 가능하도록 추가 예정
     @PostMapping("/posts/{groupType}/{groupId}")
     public ResponseEntity<ServerResponseDTO> postPost(@RequestBody PostRequestDTO postRequestDTO,
                                                       @AuthenticationPrincipal CustomUserDetails customUserDetails,
                                                       @PathVariable GroupType groupType, @PathVariable Long groupId) {
         postRequestDTO.setGroupType(groupType);
         postRequestDTO.setGroupId(groupId);
+
+        if (!postService.checkUserInGroup(groupId, groupType, customUserDetails)) {
+            return ResponseUtil.createErrorResponse(HttpStatus.FORBIDDEN, "Post/PermissionDenied", "user is not a member of the group");
+        }
 
         PostEntity newPost = postService.createPost(postRequestDTO, customUserDetails);
 
@@ -90,6 +93,11 @@ public class PostController {
         if (postService.identification(id, customUserDetails)) {
             // 이전 group type, group id 는 그대로 적용
             PostEntity originalPost = postRepository.findById(id).get();
+
+            if (!postService.checkUserInGroup(originalPost.getGroupId(), originalPost.getGroupType(), customUserDetails)) {
+                return ResponseUtil.createErrorResponse(HttpStatus.FORBIDDEN, "Post/PermissionDenied", "user is not a member of the group");
+            }
+
             postRequestDTO.setGroupId(originalPost.getGroupId());
             postRequestDTO.setGroupType(originalPost.getGroupType());
 
