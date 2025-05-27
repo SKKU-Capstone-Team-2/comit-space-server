@@ -18,16 +18,19 @@ import java.util.List;
 @RestController
 @RequestMapping("/api")
 public class ReservationController {
+
+    private final ReservationService reservationService;
+    private final ModelMapper modelMapper;
+
     @Autowired
-    private ReservationService reservationService;
-    @Autowired
-    private ModelMapper modelMapper;
+    public ReservationController(ReservationService reservationService, ModelMapper modelMapper) {
+        this.reservationService = reservationService;
+        this.modelMapper = modelMapper;
+    }
 
     // 월별 전체 예약 조회
     @GetMapping("/reservations")
-    public ResponseEntity<ServerResponseDTO> getReservations(
-            @RequestParam(required = false) Integer year,
-            @RequestParam(required = false) Integer month) {
+    public ResponseEntity<ServerResponseDTO> getReservations(@RequestParam(required = false) Integer year, @RequestParam(required = false) Integer month) {
         List<ReservationResponseDTO> reservations = reservationService.getReservationsByMonth(year, month);
         return ResponseUtil.createSuccessResponse(reservations, HttpStatus.OK);
     }

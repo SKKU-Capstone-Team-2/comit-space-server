@@ -13,10 +13,15 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/admin")
 public class ReservationAdminController {
+
+    private final ReservationService reservationService;
+    private final ModelMapper modelMapper;
+
     @Autowired
-    private ReservationService reservationService;
-    @Autowired
-    private ModelMapper modelMapper;
+    public ReservationAdminController(ReservationService reservationService, ModelMapper modelMapper) {
+        this.reservationService = reservationService;
+        this.modelMapper = modelMapper;
+    }
 
     @PatchMapping("/reservations/{id}/accept")
     public ResponseEntity<ServerResponseDTO> acceptReservation(@PathVariable Long id) {
