@@ -5,6 +5,7 @@ import com.example.comitserver.dto.CustomUserDetails;
 import com.example.comitserver.dto.PostRequestDTO;
 import com.example.comitserver.entity.PostEntity;
 import com.example.comitserver.entity.UserEntity;
+import com.example.comitserver.entity.enumeration.GroupType;
 import com.example.comitserver.repository.PostRepository;
 import com.example.comitserver.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,10 @@ public class PostService {
     public PostEntity showPost(Long id) {
         return postRepository.findById(id)
                 .orElseThrow(()-> new NoSuchElementException("Post not found with id: " + id));
+    }
+
+    public List<PostEntity> showPostsByGroup(Long groupId, GroupType groupType) {
+        return postRepository.findByGroupIdAndGroupType(groupId, groupType);
     }
 
     public PostEntity createPost(PostRequestDTO postRequestDTO, CustomUserDetails customUserDetails) {

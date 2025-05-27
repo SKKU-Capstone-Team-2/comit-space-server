@@ -51,6 +51,15 @@ public class PostController {
         return ResponseUtil.createSuccessResponse(modelMapper.map(post, PostResponseDTO.class), HttpStatus.OK);
     }
 
+    @GetMapping("/posts/{groupType}/{groupId}")
+    public ResponseEntity<ServerResponseDTO> getPostByGroup(@PathVariable Long groupId, @PathVariable GroupType groupType) {
+        List<PostEntity> posts = postService.showPostsByGroup(groupId, groupType);
+        List<PostResponseDTO> postsDTO = posts.stream()
+                .map(entity -> modelMapper.map(entity, PostResponseDTO.class))
+                .collect(Collectors.toList());
+        return ResponseUtil.createSuccessResponse(postsDTO, HttpStatus.OK);
+    }
+
     // group에 속한 사람만 생성 가능하도록 추가 예정
     @PostMapping("/posts/{groupType}/{groupId}")
     public ResponseEntity<ServerResponseDTO> postPost(@RequestBody PostRequestDTO postRequestDTO,
