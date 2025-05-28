@@ -1,10 +1,11 @@
 package com.example.comitserver.controller;
 
 import com.example.comitserver.dto.*;
-import com.example.comitserver.entity.EventEntity;
-import com.example.comitserver.entity.StudyEntity;
+import com.example.comitserver.entity.*;
+import com.example.comitserver.entity.enumeration.JoinState;
 import com.example.comitserver.repository.EventRepository;
 import com.example.comitserver.service.EventService;
+import com.example.comitserver.service.UserService;
 import com.example.comitserver.utils.ResponseUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,12 +26,14 @@ public class EventController {
     private final EventService eventService;
     private final ModelMapper modelMapper;
     private final EventRepository eventRepository;
+    private final UserService userService;
 
     @Autowired
-    public EventController(EventService eventService, ModelMapper modelMapper, EventRepository eventRepository) {
+    public EventController(EventService eventService, ModelMapper modelMapper, EventRepository eventRepository, UserService userService) {
         this.eventService = eventService;
         this.modelMapper = modelMapper;
         this.eventRepository = eventRepository;
+        this.userService = userService;
     }
 
     @GetMapping("/events")
@@ -55,6 +58,21 @@ public class EventController {
         //return ResponseEntity.ok(modelMapper.map(study, StudyResponseDTO.class));
     }
 
+    @GetMapping("/events/{id}/members")
+    public ResponseEntity<ServerResponseDTO> getEventMembers(@PathVariable Long id, @AuthenticationPrincipal CustomUserDetails customUserDetails, @RequestParam(name= "state", required = true) JoinState state) {
+        UserEntity user = userService.getUserProfile(customUserDetails.getUserId());
+
+        if(!user.getIsStaff()) return ResponseUtil.createErrorResponse(HttpStatus.FORBIDDEN, "Event/NotStaff", "the user is not a staff member");
+
+        List<CreatedEventEntity> createdEventEntities = eventService.getCreatedEventEntityByJoinState(id,state);
+
+        List<UserResponseDTO> userDTOs = createdEventEntities.stream().map(CreatedEventEntity::getUser).map(userEntity -> modelMapper.map(userEntity, UserResponseDTO.class)).toList();
+
+        return ResponseUtil.createSuccessResponse(userDTOs, HttpStatus.OK);
+        
+
+    }
+
     @PostMapping("/events/{id}/join")
     public ResponseEntity<ServerResponseDTO> joinEvent(@PathVariable Long id,
                                                        @AuthenticationPrincipal CustomUserDetails customUserDetails) {
@@ -77,6 +95,7 @@ public class EventController {
         }
         else return ResponseUtil.createErrorResponse(HttpStatus.FORBIDDEN, "Event/alreadyJoined", "the user is already in this event");
     }
+
 
     @DeleteMapping("/events/{id}/leave")
     public ResponseEntity<ServerResponseDTO> leaveEvent(@PathVariable Long id,

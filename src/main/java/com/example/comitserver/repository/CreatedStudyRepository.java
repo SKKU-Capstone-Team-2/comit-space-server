@@ -1,7 +1,9 @@
 package com.example.comitserver.repository;
 
+import com.example.comitserver.entity.CreatedEventEntity;
 import com.example.comitserver.entity.CreatedStudyEntity;
 import com.example.comitserver.entity.UserEntity;
+import com.example.comitserver.entity.enumeration.JoinState;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -17,4 +19,6 @@ public interface CreatedStudyRepository extends JpaRepository<CreatedStudyEntity
 
     boolean existsByStudyIdAndUserId(Long studyId, Long requesterId);
     Optional<CreatedStudyEntity> findByStudyIdAndUserId(Long studyId, Long requesterId);
+
+    List<CreatedStudyEntity> findByStudyIdAndState(Long studyId, JoinState state);
 }

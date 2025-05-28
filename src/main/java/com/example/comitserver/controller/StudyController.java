@@ -1,10 +1,11 @@
 package com.example.comitserver.controller;
 
-import com.example.comitserver.dto.CustomUserDetails;
-import com.example.comitserver.dto.ServerResponseDTO;
-import com.example.comitserver.dto.StudyRequestDTO;
-import com.example.comitserver.dto.StudyResponseDTO;
+import com.example.comitserver.dto.*;
+import com.example.comitserver.entity.CreatedStudyEntity;
 import com.example.comitserver.entity.StudyEntity;
+import com.example.comitserver.entity.UserEntity;
+import com.example.comitserver.entity.enumeration.JoinState;
+import com.example.comitserver.repository.CreatedStudyRepository;
 import com.example.comitserver.repository.StudyRepository;
 import com.example.comitserver.service.StudyService;
 import com.example.comitserver.utils.ResponseUtil;
@@ -17,7 +18,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -27,12 +31,14 @@ public class StudyController {
     private final StudyService studyService;
     private final ModelMapper modelMapper;
     private final StudyRepository studyRepository;
+    private final CreatedStudyRepository createdStudyRepository;
 
     @Autowired
-    public StudyController(StudyService studyService, ModelMapper modelMapper, StudyRepository studyRepository) {
+    public StudyController(StudyService studyService, ModelMapper modelMapper, StudyRepository studyRepository, CreatedStudyRepository createdStudyRepository) {
         this.studyService = studyService;
         this.modelMapper = modelMapper;
         this.studyRepository = studyRepository;
+        this.createdStudyRepository = createdStudyRepository;
     }
 
     @GetMapping("/studies")
@@ -136,6 +142,53 @@ public class StudyController {
         else return ResponseUtil.createErrorResponse(HttpStatus.FORBIDDEN, "Study/alreadyJoined", "the user is already in this study");
     }
 
+    @GetMapping("/studies/{id}/members")
+    public ResponseEntity<ServerResponseDTO> getStudyMembers(@PathVariable Long id, @AuthenticationPrincipal CustomUserDetails customUserDetails, @RequestParam(name= "state", required = true) JoinState state) {
+        if (studyRepository.findById(id).isEmpty()) return ResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND, "Study/CannotFindId", "study with that id not found");
+
+        List<CreatedStudyEntity> createdStudyEntities = studyService.getCreatedStudyEntityByJoinState(id,customUserDetails,state);
+
+        List<UserResponseDTO> userDTOs = createdStudyEntities.stream().map(CreatedStudyEntity::getUser).map(user -> modelMapper.map(user, UserResponseDTO.class)).toList();
+
+        return ResponseUtil.createSuccessResponse(userDTOs, HttpStatus.OK);
+
+    }
+
+    @PatchMapping("/studies/{id}/{memberId}")
+    public ResponseEntity<ServerResponseDTO> patchState(@PathVariable Long id, @PathVariable Long memberId, @RequestBody Map<String, String> body, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        // 요청한 사람이 만든 스터디가 아니면 에러
+        if(!studyService.identification(id, customUserDetails)) return ResponseUtil.createErrorResponse(HttpStatus.FORBIDDEN, "Study/PermissionDenied", "the user does not have permission to update the study join request");
+
+        // 해당 스터디에 상태 수정하려는 멤버 아이디가 존재하지 않는다면 에러
+        if(!createdStudyRepository.existsByStudyIdAndUserId(id, memberId)) return ResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND, "Study/CannotFindId", "study join request with that member id not found");
+
+        Optional<CreatedStudyEntity> createdStudy = createdStudyRepository.findByStudyIdAndUserId(id,memberId);
+
+        if(createdStudy.isEmpty()) return ResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND, "Study/CannotFindId", "study join request with that member id not found");
+
+        CreatedStudyEntity entity = createdStudy.get();
+
+        // 스터디 가입 요청 상태가 Wait가 아니라면 에러
+        if (!entity.getState().equals(JoinState.Wait)) return ResponseUtil.createErrorResponse(HttpStatus.BAD_REQUEST, "StudyJoin/JoinState", "study join request must be Wait");
+
+        String joinStateStr = body.get("joinState");
+        JoinState newState;
+        try {
+            newState = JoinState.valueOf(joinStateStr); // 문자열 → enum
+        } catch (IllegalArgumentException e) {
+            return ResponseUtil.createErrorResponse(HttpStatus.BAD_REQUEST, "InvalidJoinState", "joinState must be Accept or Reject");
+        }
+
+        entity.setState(newState);
+        createdStudyRepository.save(entity);
+
+        Map<String, String> joinState = new HashMap<>();
+        joinState.put("joinState", entity.getState().toString());
+        return ResponseUtil.createSuccessResponse(joinState, HttpStatus.OK);
+
+    }
+
+
     @DeleteMapping("/studies/{id}/leave")
     public ResponseEntity<ServerResponseDTO> leaveStudy(@PathVariable Long id,
                                                         @AuthenticationPrincipal CustomUserDetails customUserDetails) {
@@ -154,6 +207,7 @@ public class StudyController {
             return ResponseUtil.createErrorResponse(HttpStatus.FORBIDDEN, "Study/NotJoined", "the user is not a member of this study");
         }
     }
+
 
 
 

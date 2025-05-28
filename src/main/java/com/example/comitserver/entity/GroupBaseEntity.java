@@ -1,5 +1,6 @@
 package com.example.comitserver.entity;
 
+import com.example.comitserver.entity.enumeration.JoinState;
 import com.example.comitserver.entity.enumeration.Semester;
 import com.example.comitserver.utils.StringListConverter;
 import jakarta.persistence.*;
