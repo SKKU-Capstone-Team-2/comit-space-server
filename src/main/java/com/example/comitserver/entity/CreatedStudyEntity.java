@@ -26,7 +26,7 @@ public class CreatedStudyEntity {
     private StudyEntity study;
 
     @Getter
-    @Column(nullable = false)
+    @Column(nullable = false , name = "is_leader")
     private boolean isLeader;
 
     @Enumerated(EnumType.STRING)

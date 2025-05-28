@@ -3,6 +3,7 @@ package com.example.comitserver.service;
 import com.example.comitserver.dto.CustomUserDetails;
 import com.example.comitserver.dto.EventRequestDTO;
 import com.example.comitserver.entity.*;
+import com.example.comitserver.entity.enumeration.JoinState;
 import com.example.comitserver.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -72,6 +73,11 @@ public class EventService {
         createdEvent.setUser(requestUser);
         createdEvent.setEvent(showEvent(eventId));
         createdEventRepository.save(createdEvent);
+    }
+
+    public List<CreatedEventEntity> getCreatedEventEntityByJoinState(Long eventId, JoinState joinState) {
+
+        return createdEventRepository.findByEventIdAndState(eventId, joinState);
     }
 
     public void leaveEvent(Long eventId, CustomUserDetails customUserDetails) {

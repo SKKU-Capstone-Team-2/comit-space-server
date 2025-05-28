@@ -19,4 +19,5 @@ public interface CreatedEventRepository extends JpaRepository<CreatedEventEntity
 
     boolean existsByEventIdAndUserId(Long eventId, Long requesterId);
     Optional<CreatedEventEntity> findByEventIdAndUserId(Long eventId, Long requesterId);
+    List<CreatedEventEntity> findByEventIdAndState(Long eventId, JoinState state);
 }
