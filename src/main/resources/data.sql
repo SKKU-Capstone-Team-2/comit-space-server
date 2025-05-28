@@ -17,10 +17,10 @@ INSERT INTO study_entity (
 
 -- Created Study 데이터
 INSERT INTO created_study_entity (
-    id, user_id, study_id, is_leader
+    id, user_id, study_id, is_leader, state
 ) VALUES
-      (1, 2, 1, true),  -- comit01이 스프링1 스터디 생성
-      (2, 3, 2, true);  -- comit02가 스프링2 스터디 생성
+      (1, 2, 1, true, 'Accept'),  -- comit01이 스프링1 스터디 생성
+      (2, 3, 2, true, 'Reject');  -- comit02가 스프링2 스터디 생성
 
 -- Event 데이터
 INSERT INTO event_entity (

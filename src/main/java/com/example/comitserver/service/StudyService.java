@@ -2,12 +2,15 @@ package com.example.comitserver.service;
 
 import com.example.comitserver.dto.CustomUserDetails;
 import com.example.comitserver.dto.StudyRequestDTO;
+import com.example.comitserver.dto.UserResponseDTO;
 import com.example.comitserver.entity.CreatedStudyEntity;
 import com.example.comitserver.entity.StudyEntity;
 import com.example.comitserver.entity.UserEntity;
+import com.example.comitserver.entity.enumeration.JoinState;
 import com.example.comitserver.repository.CreatedStudyRepository;
 import com.example.comitserver.repository.StudyRepository;
 import com.example.comitserver.repository.UserRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -87,6 +90,12 @@ public class StudyService {
         return !exists;
     }
 
+    public List<CreatedStudyEntity> getCreatedStudyEntityByJoinState(Long studyId, CustomUserDetails customUserDetails, JoinState joinState) {
+        Long requesterId = customUserDetails.getUserId();
+
+        return createdStudyRepository.findByStudyIdAndState(studyId, joinState);
+    }
+
     public void joinStudy(Long studyId, CustomUserDetails customUserDetails) {
 
         UserEntity requestUser = userRepository.findById(customUserDetails.getUserId())
@@ -96,6 +105,7 @@ public class StudyService {
         createdStudy.setUser(requestUser);
         createdStudy.setStudy(showStudy(studyId));
         createdStudy.setLeader(false);
+        createdStudy.setState(JoinState.Wait);
         createdStudyRepository.save(createdStudy);
     }
 

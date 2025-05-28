@@ -1,8 +1,10 @@
 package com.example.comitserver.entity;
 
+import com.example.comitserver.entity.enumeration.JoinState;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 @Data
@@ -26,4 +28,9 @@ public class CreatedStudyEntity {
     @Getter
     @Column(nullable = false)
     private boolean isLeader;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private JoinState state;
+
 }

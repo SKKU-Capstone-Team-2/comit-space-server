@@ -1,10 +1,11 @@
 package com.example.comitserver.controller;
 
-import com.example.comitserver.dto.CustomUserDetails;
-import com.example.comitserver.dto.ServerResponseDTO;
-import com.example.comitserver.dto.StudyRequestDTO;
-import com.example.comitserver.dto.StudyResponseDTO;
+import com.example.comitserver.dto.*;
+import com.example.comitserver.entity.CreatedStudyEntity;
 import com.example.comitserver.entity.StudyEntity;
+import com.example.comitserver.entity.UserEntity;
+import com.example.comitserver.entity.enumeration.JoinState;
+import com.example.comitserver.repository.CreatedStudyRepository;
 import com.example.comitserver.repository.StudyRepository;
 import com.example.comitserver.service.StudyService;
 import com.example.comitserver.utils.ResponseUtil;
@@ -27,12 +28,14 @@ public class StudyController {
     private final StudyService studyService;
     private final ModelMapper modelMapper;
     private final StudyRepository studyRepository;
+    private final CreatedStudyRepository createdStudyRepository;
 
     @Autowired
-    public StudyController(StudyService studyService, ModelMapper modelMapper, StudyRepository studyRepository) {
+    public StudyController(StudyService studyService, ModelMapper modelMapper, StudyRepository studyRepository, CreatedStudyRepository createdStudyRepository) {
         this.studyService = studyService;
         this.modelMapper = modelMapper;
         this.studyRepository = studyRepository;
+        this.createdStudyRepository = createdStudyRepository;
     }
 
     @GetMapping("/studies")
@@ -136,6 +139,18 @@ public class StudyController {
         else return ResponseUtil.createErrorResponse(HttpStatus.FORBIDDEN, "Study/alreadyJoined", "the user is already in this study");
     }
 
+    @GetMapping("/studies/{id}/members")
+    public ResponseEntity<ServerResponseDTO> getStudyMembers(@PathVariable Long id, @AuthenticationPrincipal CustomUserDetails customUserDetails, @RequestParam(name= "state", required = true) JoinState state) {
+        if (studyRepository.findById(id).isEmpty()) return ResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND, "Study/CannotFindId", "study with that id not found");
+
+        List<CreatedStudyEntity> createdStudyEntities = studyService.getCreatedStudyEntityByJoinState(id,customUserDetails,state);
+
+        List<UserResponseDTO> userDTOs = createdStudyEntities.stream().map(CreatedStudyEntity::getUser).map(user -> modelMapper.map(user, UserResponseDTO.class)).toList();
+
+        return ResponseUtil.createSuccessResponse(userDTOs, HttpStatus.OK);
+
+    }
+
     @DeleteMapping("/studies/{id}/leave")
     public ResponseEntity<ServerResponseDTO> leaveStudy(@PathVariable Long id,
                                                         @AuthenticationPrincipal CustomUserDetails customUserDetails) {
@@ -154,7 +169,6 @@ public class StudyController {
             return ResponseUtil.createErrorResponse(HttpStatus.FORBIDDEN, "Study/NotJoined", "the user is not a member of this study");
         }
     }
-
 
 
 }
