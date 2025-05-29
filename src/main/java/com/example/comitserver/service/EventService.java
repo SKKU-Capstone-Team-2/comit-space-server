@@ -72,6 +72,7 @@ public class EventService {
         CreatedEventEntity createdEvent = new CreatedEventEntity();
         createdEvent.setUser(requestUser);
         createdEvent.setEvent(showEvent(eventId));
+        createdEvent.setState(JoinState.Wait);
         createdEventRepository.save(createdEvent);
     }
 
