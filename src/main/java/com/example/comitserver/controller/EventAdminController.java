@@ -2,6 +2,7 @@ package com.example.comitserver.controller;
 
 import com.example.comitserver.dto.*;
 import com.example.comitserver.entity.EventEntity;
+import com.example.comitserver.entity.StudyEntity;
 import com.example.comitserver.repository.EventRepository;
 import com.example.comitserver.service.EventService;
 import com.example.comitserver.utils.ResponseUtil;
@@ -13,7 +14,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -53,38 +56,19 @@ public class EventAdminController {
         //return ResponseEntity.ok(modelMapper.map(study, StudyResponseDTO.class));
     }
 
-    @PostMapping("/events")
-    public ResponseEntity<ServerResponseDTO> postEvent(@RequestBody EventRequestDTO eventRequestDTO) {
-        EventEntity newEvent = eventService.createEvent(eventRequestDTO);
+    @PatchMapping("/events/{id}")
+    public ResponseEntity<ServerResponseDTO> patchIsRecruiting(@PathVariable Long id, @RequestBody Map<String, Boolean> body) {
+        if (eventRepository.findById(id).isEmpty()) return ResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND, "Event/CannotFindId", "event with that id not found");
 
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest() // 현재 요청한 전체 URI(/api/events) 기준으로
-                .path("/{id}") // /{id} 추가
-                .buildAndExpand(newEvent.getId())
-                .toUri();
+        EventEntity event = eventService.showEvent(id);
+        event.setIsRecruiting(body.get("isRecruiting"));
+        eventRepository.save(event);
 
-        return ResponseUtil.createSuccessResponse(modelMapper.map(newEvent, EventResponseDTO.class), HttpStatus.CREATED, location);
-        //return ResponseEntity.created(location).body(modelMapper.map(newStudy, StudyResponseDTO.class));
-    }
+        Map<String, Boolean> isRecruiting = new HashMap<>();
+        isRecruiting.put("isRecruiting", event.getIsRecruiting());
 
-    @PutMapping("/events/{id}")
-    public ResponseEntity<ServerResponseDTO> putEvent(@PathVariable Long id,
-                                                      @RequestBody EventRequestDTO eventRequestDTO) {
-        if (eventRepository.findById(id).isEmpty())
-            return ResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND, "Event/CannotFindId", "event with that id not found");
+        return ResponseUtil.createSuccessResponse(isRecruiting, HttpStatus.OK);
 
-
-        EventEntity updatedEvent = eventService.updateEvent(id, eventRequestDTO);
-
-        if (updatedEvent == null) {
-            return ResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND, "Event/CannotFindId", "the result of updating event is null");
-            //return ResponseEntity.notFound().build();
-        }
-
-        return ResponseUtil.createSuccessResponse(modelMapper.map(updatedEvent, EventResponseDTO.class), HttpStatus.OK);
-        //return ResponseEntity.ok(modelMapper.map(updatedStudy, StudyResponseDTO.class));
-
-        //ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
     @DeleteMapping("/events/{id}")

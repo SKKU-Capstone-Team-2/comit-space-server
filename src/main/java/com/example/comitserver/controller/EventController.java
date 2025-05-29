@@ -65,6 +65,82 @@ public class EventController {
         //return ResponseEntity.ok(modelMapper.map(study, StudyResponseDTO.class));
     }
 
+    @PostMapping("/events")
+    public ResponseEntity<ServerResponseDTO> postEvent(@RequestBody EventRequestDTO eventRequestDTO, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+
+        UserEntity user = userService.getUserProfile(customUserDetails.getUserId());
+        if (!user.getIsStaff()) return ResponseUtil.createErrorResponse(HttpStatus.FORBIDDEN, "Event/NotStaff", "the user is not a staff member");
+        EventEntity newEvent = eventService.createEvent(eventRequestDTO);
+
+
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest() // 현재 요청한 전체 URI(/api/events) 기준으로
+                .path("/{id}") // /{id} 추가
+                .buildAndExpand(newEvent.getId())
+                .toUri();
+
+        return ResponseUtil.createSuccessResponse(modelMapper.map(newEvent, EventResponseDTO.class), HttpStatus.CREATED, location);
+        //return ResponseEntity.created(location).body(modelMapper.map(newStudy, StudyResponseDTO.class));
+    }
+
+    @PutMapping("/events/{id}")
+    public ResponseEntity<ServerResponseDTO> putEvent(@PathVariable Long id,
+                                                      @RequestBody EventRequestDTO eventRequestDTO, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        UserEntity user = userService.getUserProfile(customUserDetails.getUserId());
+        if (!user.getIsStaff()) return ResponseUtil.createErrorResponse(HttpStatus.FORBIDDEN, "Event/NotStaff", "the user is not a staff member");
+
+        if (eventRepository.findById(id).isEmpty())
+            return ResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND, "Event/CannotFindId", "event with that id not found");
+
+
+        EventEntity updatedEvent = eventService.updateEvent(id, eventRequestDTO);
+
+        if (updatedEvent == null) {
+            return ResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND, "Event/CannotFindId", "the result of updating event is null");
+            //return ResponseEntity.notFound().build();
+        }
+
+        return ResponseUtil.createSuccessResponse(modelMapper.map(updatedEvent, EventResponseDTO.class), HttpStatus.OK);
+        //return ResponseEntity.ok(modelMapper.map(updatedStudy, StudyResponseDTO.class));
+
+        //ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    }
+
+    @PatchMapping("/events/{id}")
+    public ResponseEntity<ServerResponseDTO> patchIsRecruiting(@PathVariable Long id, @RequestBody Map<String, Boolean> body, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        UserEntity user = userService.getUserProfile(customUserDetails.getUserId());
+        if (!user.getIsStaff()) return ResponseUtil.createErrorResponse(HttpStatus.FORBIDDEN, "Event/NotStaff", "the user is not a staff member");
+
+        if (eventRepository.findById(id).isEmpty()) return ResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND, "Event/CannotFindId", "event with that id not found");
+
+        EventEntity event = eventService.showEvent(id);
+        event.setIsRecruiting(body.get("isRecruiting"));
+        eventRepository.save(event);
+
+        Map<String, Boolean> isRecruiting = new HashMap<>();
+        isRecruiting.put("isRecruiting", event.getIsRecruiting());
+
+        return ResponseUtil.createSuccessResponse(isRecruiting, HttpStatus.OK);
+
+    }
+
+    @DeleteMapping("/events/{id}")
+    public ResponseEntity<ServerResponseDTO> deleteEvent(@PathVariable Long id, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        UserEntity user = userService.getUserProfile(customUserDetails.getUserId());
+        if (!user.getIsStaff()) return ResponseUtil.createErrorResponse(HttpStatus.FORBIDDEN, "Event/NotStaff", "the user is not a staff member");
+
+        if (eventRepository.findById(id).isEmpty()) return ResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND, "Event/CannotFindId", "event with that id not found");
+
+        EventEntity deletedEvent = eventService.showEvent(id);
+        EventResponseDTO eventResponseDTO = modelMapper.map(deletedEvent, EventResponseDTO.class);
+
+        eventService.deleteEvent(id);
+
+        return ResponseUtil.createSuccessResponse(eventResponseDTO, HttpStatus.OK);
+        //return ResponseEntity.ok(studyResponseDTO);
+
+    }
+
     @GetMapping("/events/{id}/members")
     public ResponseEntity<ServerResponseDTO> getEventMembers(@PathVariable Long id, @AuthenticationPrincipal CustomUserDetails customUserDetails, @RequestParam(name= "state", required = true) JoinState state) {
         UserEntity user = userService.getUserProfile(customUserDetails.getUserId());
