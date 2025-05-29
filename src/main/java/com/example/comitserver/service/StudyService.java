@@ -55,6 +55,7 @@ public class StudyService {
         createdStudy.setUser(mentor);
         createdStudy.setStudy(newStudy);
         createdStudy.setLeader(true);
+        createdStudy.setState(JoinState.Accept);
         createdStudyRepository.save(createdStudy);
 
         return newStudy;
