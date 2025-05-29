@@ -53,6 +53,7 @@ public class EventService {
     }
 
     public void deleteEvent(Long id) {
+        createdEventRepository.deleteAllByEventId(id);
         EventEntity deletingEvent = showEvent(id);
         eventRepository.delete(deletingEvent);
     }

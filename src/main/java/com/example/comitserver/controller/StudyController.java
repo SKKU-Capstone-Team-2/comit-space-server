@@ -2,12 +2,15 @@ package com.example.comitserver.controller;
 
 import com.example.comitserver.dto.*;
 import com.example.comitserver.entity.CreatedStudyEntity;
+import com.example.comitserver.entity.EventEntity;
 import com.example.comitserver.entity.StudyEntity;
 import com.example.comitserver.entity.UserEntity;
 import com.example.comitserver.entity.enumeration.JoinState;
 import com.example.comitserver.repository.CreatedStudyRepository;
 import com.example.comitserver.repository.StudyRepository;
+import com.example.comitserver.service.EventService;
 import com.example.comitserver.service.StudyService;
+import com.example.comitserver.service.UserService;
 import com.example.comitserver.utils.ResponseUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,13 +35,15 @@ public class StudyController {
     private final ModelMapper modelMapper;
     private final StudyRepository studyRepository;
     private final CreatedStudyRepository createdStudyRepository;
+    private final UserService userService;
 
     @Autowired
-    public StudyController(StudyService studyService, ModelMapper modelMapper, StudyRepository studyRepository, CreatedStudyRepository createdStudyRepository) {
+    public StudyController(StudyService studyService, ModelMapper modelMapper, StudyRepository studyRepository, CreatedStudyRepository createdStudyRepository, UserService userService) {
         this.studyService = studyService;
         this.modelMapper = modelMapper;
         this.studyRepository = studyRepository;
         this.createdStudyRepository = createdStudyRepository;
+        this.userService = userService;
     }
 
     @GetMapping("/studies")
@@ -98,6 +103,24 @@ public class StudyController {
         } else
             return ResponseUtil.createErrorResponse(HttpStatus.FORBIDDEN, "Study/PermissionDenied", "the user does not have permission to update this study");
         //ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    }
+
+    @PatchMapping("/studies/{id}")
+    public ResponseEntity<ServerResponseDTO> patchIsRecruiting(@PathVariable Long id, @RequestBody Map<String, Boolean> body, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+
+        if (studyRepository.findById(id).isEmpty()) return ResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND, "Event/CannotFindId", "event with that id not found");
+        UserEntity user = userService.getUserProfile(customUserDetails.getUserId());
+        if (!user.getIsStaff() && !studyService.identification(id,customUserDetails)) return ResponseUtil.createErrorResponse(HttpStatus.FORBIDDEN, "Study/PermissionDenied", "the user does not have permission to change isRecruting");
+
+        StudyEntity study = studyService.showStudy(id);
+        study.setIsRecruiting(body.get("isRecruiting"));
+        studyRepository.save(study);
+
+        Map<String, Boolean> isRecruiting = new HashMap<>();
+        isRecruiting.put("isRecruiting", study.getIsRecruiting());
+
+        return ResponseUtil.createSuccessResponse(isRecruiting, HttpStatus.OK);
+
     }
 
     @DeleteMapping("/studies/{id}")
