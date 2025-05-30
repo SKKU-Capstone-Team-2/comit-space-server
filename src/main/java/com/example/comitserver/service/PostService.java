@@ -39,6 +39,10 @@ public class PostService {
                 .orElseThrow(()-> new NoSuchElementException("Post not found with id: " + id));
     }
 
+    public List<PostEntity> showPostsByGroupType(GroupType groupType) {
+        return postRepository.findByGroupType(groupType);
+    }
+
     public List<PostEntity> showPostsByGroup(Long groupId, GroupType groupType) {
         return postRepository.findByGroupIdAndGroupType(groupId, groupType);
     }

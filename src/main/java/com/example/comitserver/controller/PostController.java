@@ -32,15 +32,6 @@ public class PostController {
         this.postRepository = postRepository;
     }
 
-    @GetMapping("/posts")
-    public ResponseEntity<ServerResponseDTO> getAllPosts() {
-        List<PostEntity> allPosts = postService.showAllPosts();
-        List<PostResponseDTO> allPostsDTO = allPosts.stream()
-                .map(entity -> modelMapper.map(entity, PostResponseDTO.class))
-                .collect(Collectors.toList());
-
-        return ResponseUtil.createSuccessResponse(allPostsDTO, HttpStatus.OK);
-    }
 
     @GetMapping("/posts/{id}")
     public ResponseEntity<ServerResponseDTO> getPostById(@PathVariable Long id) {
@@ -49,6 +40,24 @@ public class PostController {
 
         PostEntity post = postService.showPost(id);
         return ResponseUtil.createSuccessResponse(modelMapper.map(post, PostResponseDTO.class), HttpStatus.OK);
+    }
+
+    @GetMapping("/posts")
+    public ResponseEntity<ServerResponseDTO> getPostsByGroupType(@RequestParam(required = false) GroupType groupType) {
+        // "/posts/{groupType}" 매핑은 "/posts/{id}" 와 충돌이 있어 request parameter 로 설정
+        if (groupType == null) {
+            List<PostEntity> allPosts = postService.showAllPosts();
+            List<PostResponseDTO> allPostsDTO = allPosts.stream()
+                    .map(entity -> modelMapper.map(entity, PostResponseDTO.class))
+                    .collect(Collectors.toList());
+            return ResponseUtil.createSuccessResponse(allPostsDTO, HttpStatus.OK);
+        } else {
+            List<PostEntity> posts = postService.showPostsByGroupType(groupType);
+            List<PostResponseDTO> postsDTO = posts.stream()
+                    .map(entity -> modelMapper.map(entity, PostResponseDTO.class))
+                    .collect(Collectors.toList());
+            return ResponseUtil.createSuccessResponse(postsDTO, HttpStatus.OK);
+        }
     }
 
     @GetMapping("/posts/{groupType}/{groupId}")
