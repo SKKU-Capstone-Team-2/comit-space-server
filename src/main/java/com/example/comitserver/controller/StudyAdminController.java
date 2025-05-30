@@ -53,23 +53,23 @@ public class StudyAdminController {
         //return ResponseEntity.ok(modelMapper.map(study, StudyResponseDTO.class));
     }
 
-    @PutMapping("/studies/{id}")
-    public ResponseEntity<ServerResponseDTO> putStudy(@PathVariable Long id,
-                                                      @RequestBody StudyRequestDTO studyRequestDTO) {
-        if (studyRepository.findById(id).isEmpty())
-            return ResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND, "Study/CannotFindId", "study with that id not found");
-
-        StudyEntity updatedStudy = studyService.updateStudy(id, studyRequestDTO);
-
-        if (updatedStudy == null) {
-            return ResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND, "Study/CannotFindId", "the result of updating study is null");
-            //return ResponseEntity.notFound().build();
-        }
-
-        return ResponseUtil.createSuccessResponse(modelMapper.map(updatedStudy, StudyResponseDTO.class), HttpStatus.OK);
-        //return ResponseEntity.ok(modelMapper.map(updatedStudy, StudyResponseDTO.class));
-
-    }
+//    @PutMapping("/studies/{id}")
+//    public ResponseEntity<ServerResponseDTO> putStudy(@PathVariable Long id,
+//                                                      @RequestBody StudyRequestDTO studyRequestDTO) {
+//        if (studyRepository.findById(id).isEmpty())
+//            return ResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND, "Study/CannotFindId", "study with that id not found");
+//
+//        StudyEntity updatedStudy = studyService.updateStudy(id, studyRequestDTO);
+//
+//        if (updatedStudy == null) {
+//            return ResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND, "Study/CannotFindId", "the result of updating study is null");
+//            //return ResponseEntity.notFound().build();
+//        }
+//
+//        return ResponseUtil.createSuccessResponse(modelMapper.map(updatedStudy, StudyResponseDTO.class), HttpStatus.OK);
+//        //return ResponseEntity.ok(modelMapper.map(updatedStudy, StudyResponseDTO.class));
+//
+//    }
 
     @PatchMapping("/studies/{id}")
     public ResponseEntity<ServerResponseDTO> patchIsRecruiting(@PathVariable Long id, @RequestBody Map<String, Boolean> body) {

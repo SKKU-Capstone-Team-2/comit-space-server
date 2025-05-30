@@ -1,5 +1,6 @@
 package com.example.comitserver.entity;
 
+import com.example.comitserver.entity.enumeration.JoinState;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
@@ -19,4 +20,8 @@ public class CreatedEventEntity {
     @ManyToOne
     @JoinColumn(name = "event_id", nullable = false)
     private EventEntity event;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private JoinState state;
 }

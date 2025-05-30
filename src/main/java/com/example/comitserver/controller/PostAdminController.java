@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -43,7 +45,7 @@ public class PostAdminController {
 
     @GetMapping("/posts/{id}")
     public ResponseEntity<ServerResponseDTO> getPostById(@PathVariable Long id) {
-        if(postRepository.findById(id).isEmpty())
+        if (postRepository.findById(id).isEmpty())
             return ResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND, "Post/CannotFindId", "post with that id not found");
 
         PostEntity post = postService.showPost(id);

@@ -8,6 +8,8 @@ import com.example.comitserver.entity.UserEntity;
 import com.example.comitserver.entity.enumeration.GroupType;
 import com.example.comitserver.repository.PostRepository;
 import com.example.comitserver.repository.UserRepository;
+import com.example.comitserver.repository.CreatedStudyRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,10 +22,12 @@ import java.util.Objects;
 public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final CreatedStudyRepository createdStudyRepository;
 
-    public PostService(PostRepository postRepository, UserRepository userRepository) {
+    public PostService(PostRepository postRepository, UserRepository userRepository, CreatedStudyRepository createdStudyRepository) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
+        this.createdStudyRepository = createdStudyRepository;
     }
 
     public List<PostEntity> showAllPosts() {
@@ -33,6 +37,10 @@ public class PostService {
     public PostEntity showPost(Long id) {
         return postRepository.findById(id)
                 .orElseThrow(()-> new NoSuchElementException("Post not found with id: " + id));
+    }
+
+    public List<PostEntity> showPostsByGroupType(GroupType groupType) {
+        return postRepository.findByGroupType(groupType);
     }
 
     public List<PostEntity> showPostsByGroup(Long groupId, GroupType groupType) {
@@ -78,6 +86,13 @@ public class PostService {
         Long authorId = post.getAuthor().getId();
         Long requesterId = customUserDetails.getUserId();
         return Objects.equals(requesterId, authorId);
+    }
+
+    public boolean checkUserInGroup(Long groupId, GroupType groupType, CustomUserDetails userDetails) {
+        if (groupType == GroupType.STUDY) {
+            return createdStudyRepository.existsByStudyIdAndUserId(groupId, userDetails.getUserId());
+        }
+        return false;
     }
 
 }
