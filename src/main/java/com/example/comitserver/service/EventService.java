@@ -8,6 +8,7 @@ import com.example.comitserver.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -58,9 +59,23 @@ public class EventService {
         eventRepository.delete(deletingEvent);
     }
 
+    public void updateEventRecruitment(Long eventId) {
+        EventEntity eventToUpdate = showEvent(eventId);
+        if (eventToUpdate.getIsRecruiting() && eventToUpdate.getStartDate().isBefore(LocalDate.now())){
+            eventToUpdate.setIsRecruiting(false);
+        }
+    }
+
     public Boolean checkEventJoinAvailable(Long eventId, CustomUserDetails customUserDetails) {
         Long requesterId = customUserDetails.getUserId();
         boolean exists = createdEventRepository.existsByEventIdAndUserId(eventId, requesterId);
+
+        updateEventRecruitment(eventId);
+
+        EventEntity eventToCheck = showEvent(eventId);
+        if (!eventToCheck.getIsRecruiting()){
+            return false;
+        }
 
         return !exists;
     }
@@ -102,5 +117,24 @@ public class EventService {
         event.setIsRecruiting(dto.getIsRecruiting());
         event.setSemester(dto.getSemester());
         event.setYear(dto.getYear());
+        event.setStartDate(dto.getStartDate());
+        event.setEndDate(dto.getEndDate());
     }
+
+    public boolean checkDate(LocalDate startDate, LocalDate endDate) {
+        if (startDate.isAfter(endDate) || startDate.isBefore(LocalDate.now())) {
+            return false;
+        }
+        return true;
+    }
+
+    public boolean isDuplicateEvent(EventRequestDTO dto) {
+        return eventRepository.existsByTitleAndStartDateAndEndDateAndLocation(
+                dto.getTitle(),
+                dto.getStartDate(),
+                dto.getEndDate(),
+                dto.getLocation()
+        );
+    }
+
 }

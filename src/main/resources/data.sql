@@ -25,11 +25,11 @@ INSERT INTO created_study_entity (
 
 -- Event 데이터
 INSERT INTO event_entity (
-    id, title, image_src, start_time, end_time, description, is_recruiting, semester, year, tags,
+    id, title, image_src, start_date,end_date, start_time, end_time, description, is_recruiting, semester, year, tags,
     created_date, modified_date, location
 ) VALUES
-      (1, 'COMIT 해커톤', 'event1.jpg', '10:00', '18:00', 'COMIT 연합 해커톤', true, 'Spring', 2024, '["Hackathon", "Programming"]', NOW(), NOW(), '성균관대학교 수원캠퍼스'),
-      (2, 'COMIT 정기 세미나', 'event2.jpg', '14:00', '16:00', '월간 정기 세미나', false, 'Spring', 2024, '["Seminar", "Tech"]', NOW(), NOW(), '성균관대학교 서울캠퍼스');
+      (1, 'COMIT 해커톤', 'event1.jpg', '2025-06-01','2025-06-05', '10:00','18:00', 'COMIT 연합 해커톤', true, 'Spring', 2024, '["Hackathon", "Programming"]', NOW(), NOW(), '성균관대학교 수원캠퍼스'),
+      (2, 'COMIT 정기 세미나', 'event2.jpg', '2025-07-20','2025-07-20','14:00', '16:00', '월간 정기 세미나', false, 'Spring', 2024, '["Seminar", "Tech"]', NOW(), NOW(), '성균관대학교 서울캠퍼스');
 
 -- Created Event 데이터
 INSERT INTO created_event_entity (

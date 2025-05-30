@@ -9,6 +9,7 @@ import com.example.comitserver.repository.EventRepository;
 import com.example.comitserver.service.EventService;
 import com.example.comitserver.service.UserService;
 import com.example.comitserver.utils.ResponseUtil;
+import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -70,6 +71,15 @@ public class EventController {
 
         UserEntity user = userService.getUserProfile(customUserDetails.getUserId());
         if (!user.getIsStaff()) return ResponseUtil.createErrorResponse(HttpStatus.FORBIDDEN, "Event/NotStaff", "the user is not a staff member");
+        if (!eventService.checkDate(eventRequestDTO.getStartDate(),eventRequestDTO.getEndDate())){
+            return ResponseUtil.createErrorResponse(HttpStatus.FORBIDDEN, "Event/InvalidDate", "the startDate and endDate is always future and endDate should be after startDate");
+        }
+
+        if (eventService.isDuplicateEvent(eventRequestDTO)) {
+            return ResponseUtil.createErrorResponse(HttpStatus.CONFLICT, "Event/Duplicate", "An event with the same title, date, and location already exists.");
+        }
+
+
         EventEntity newEvent = eventService.createEvent(eventRequestDTO);
 
 
@@ -91,6 +101,7 @@ public class EventController {
 
         if (eventRepository.findById(id).isEmpty())
             return ResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND, "Event/CannotFindId", "event with that id not found");
+        eventService.updateEventRecruitment(id);
 
 
         EventEntity updatedEvent = eventService.updateEvent(id, eventRequestDTO);
@@ -112,6 +123,7 @@ public class EventController {
         if (!user.getIsStaff()) return ResponseUtil.createErrorResponse(HttpStatus.FORBIDDEN, "Event/NotStaff", "the user is not a staff member");
 
         if (eventRepository.findById(id).isEmpty()) return ResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND, "Event/CannotFindId", "event with that id not found");
+        eventService.updateEventRecruitment(id);
 
         EventEntity event = eventService.showEvent(id);
         event.setIsRecruiting(body.get("isRecruiting"));
@@ -130,6 +142,7 @@ public class EventController {
         if (!user.getIsStaff()) return ResponseUtil.createErrorResponse(HttpStatus.FORBIDDEN, "Event/NotStaff", "the user is not a staff member");
 
         if (eventRepository.findById(id).isEmpty()) return ResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND, "Event/CannotFindId", "event with that id not found");
+        eventService.updateEventRecruitment(id);
 
         EventEntity deletedEvent = eventService.showEvent(id);
         EventResponseDTO eventResponseDTO = modelMapper.map(deletedEvent, EventResponseDTO.class);
@@ -146,6 +159,9 @@ public class EventController {
         UserEntity user = userService.getUserProfile(customUserDetails.getUserId());
 
         if(!user.getIsStaff()) return ResponseUtil.createErrorResponse(HttpStatus.FORBIDDEN, "Event/NotStaff", "the user is not a staff member");
+
+        if (eventRepository.findById(id).isEmpty()) return ResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND, "Event/CannotFindId", "event with that id not found");
+        eventService.updateEventRecruitment(id);
 
         List<CreatedEventEntity> createdEventEntities = eventService.getCreatedEventEntityByJoinState(id,state);
 
@@ -194,6 +210,7 @@ public class EventController {
 
         if (eventRepository.findById(id).isEmpty()) return ResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND, "Event/CannotFindId", "event with that id not found");
 
+        //이벤트가 마감되었거나, 이미 가입신청/가입완료인 경우 에러
         if(eventService.checkEventJoinAvailable(id, customUserDetails)){
             eventService.joinEvent(id, customUserDetails);
             EventEntity joinEvent = eventService.showEvent(id);
@@ -208,7 +225,7 @@ public class EventController {
             //return ResponseEntity.created(location).body(modelMapper.map(newStudy, StudyResponseDTO.class));
 
         }
-        else return ResponseUtil.createErrorResponse(HttpStatus.FORBIDDEN, "Event/alreadyJoined", "the user is already in this event");
+        else return ResponseUtil.createErrorResponse(HttpStatus.FORBIDDEN, "Event/cannotJoin", "the user cannot be joined");
     }
 
 
@@ -218,6 +235,11 @@ public class EventController {
         // 스터디가 존재하지 않을 경우 처리
         if (eventRepository.findById(id).isEmpty()) {
             return ResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND, "Event/CannotFindId", "event with that id not found");
+        }
+
+        eventService.updateEventRecruitment(id);
+        if (!eventService.showEvent(id).getIsRecruiting()){
+            return ResponseUtil.createErrorResponse(HttpStatus.FORBIDDEN, "Event/AlreadyEnd", "the event with that id already started or ended");
         }
 
         // 요청자가 해당 스터디에 가입되어 있는지 확인

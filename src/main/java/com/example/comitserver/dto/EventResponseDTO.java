@@ -3,6 +3,7 @@ package com.example.comitserver.dto;
 import com.example.comitserver.entity.enumeration.Semester;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -18,4 +19,6 @@ public class EventResponseDTO {
     private Boolean isRecruiting;
     private Semester semester;
     private Integer year;
+    private LocalDate startDate;
+    private LocalDate endDate;
 }

@@ -71,6 +71,10 @@ public class StudyController {
     @PostMapping("/studies")
     public ResponseEntity<ServerResponseDTO> postStudy(@RequestBody StudyRequestDTO studyRequestDTO,
                                                        @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        if (studyService.isDuplicateStudy(studyRequestDTO, customUserDetails)) {
+            return ResponseUtil.createErrorResponse(HttpStatus.CONFLICT, "Study/Duplicate", "You already have a study at the same time.");
+        }
+
         StudyEntity newStudy = studyService.createStudy(studyRequestDTO, customUserDetails);
 
         URI location = ServletUriComponentsBuilder

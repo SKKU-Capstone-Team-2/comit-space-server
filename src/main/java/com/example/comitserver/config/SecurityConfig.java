@@ -64,7 +64,6 @@ public class SecurityConfig {
                         // 서버 cors 허용
                         configuration.setAllowedOrigins(List.of(
                                 "http://localhost:3000",
-                                "https://capstone-backend.comit-server.com",
                                 "https://comit-space-client.vercel.app"
                         ));
                         configuration.setAllowedMethods(Collections.singletonList("*"));
