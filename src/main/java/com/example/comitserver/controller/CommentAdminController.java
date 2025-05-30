@@ -7,6 +7,7 @@ import com.example.comitserver.repository.CommentRepository;
 import com.example.comitserver.service.CommentService;
 import com.example.comitserver.utils.ResponseUtil;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,7 @@ public class CommentAdminController {
     private final ModelMapper modelMapper;
     private final CommentRepository commentRepository;
 
+    @Autowired
     public CommentAdminController(CommentService commentService, ModelMapper modelMapper, CommentRepository commentRepository) {
         this.commentService = commentService;
         this.modelMapper = modelMapper;

@@ -8,9 +8,13 @@ import com.example.comitserver.repository.PostRepository;
 import com.example.comitserver.service.PostService;
 import com.example.comitserver.utils.ResponseUtil;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,6 +26,7 @@ public class PostAdminController {
     private final ModelMapper modelMapper;
     private final PostRepository postRepository;
 
+    @Autowired
     public PostAdminController(PostService postService, ModelMapper modelMapper, PostRepository postRepository) {
         this.postService = postService;
         this.modelMapper = modelMapper;
