@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ReservationRepository extends JpaRepository<ReservationEntity, Long> {
-    @Query("SELECT COUNT(r) FROM ReservationEntity r WHERE r.startTime < :endTime AND r.endTime > :startTime")
+    @Query("SELECT COUNT(r) FROM ReservationEntity r WHERE r.startTime < :endTime AND r.endTime > :startTime AND r.isVerified = 'ACCEPT'")
     long countOverlappingReservations(@Param("startTime") LocalDateTime startTime, @Param("endTime") LocalDateTime endTime);
 
     List<ReservationEntity> findByReserverId(Long reserverId);
