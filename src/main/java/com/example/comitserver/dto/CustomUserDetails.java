@@ -48,6 +48,7 @@ public class CustomUserDetails implements UserDetails {
     }
 
 
+
     @Override
     public boolean isAccountNonExpired() {
         return true;
@@ -66,5 +67,9 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public boolean isStaff() {
+        return userEntity.getIsStaff();
     }
 }

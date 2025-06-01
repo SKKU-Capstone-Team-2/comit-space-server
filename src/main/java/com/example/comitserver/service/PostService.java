@@ -91,6 +91,8 @@ public class PostService {
     public boolean checkUserInGroup(Long groupId, GroupType groupType, CustomUserDetails userDetails) {
         if (groupType == GroupType.STUDY) {
             return createdStudyRepository.existsByStudyIdAndUserId(groupId, userDetails.getUserId());
+        } else if (groupType == GroupType.EVENT) {
+            return userDetails.isStaff(); // event의 경우 운영진 여부로 판단
         }
         return false;
     }
