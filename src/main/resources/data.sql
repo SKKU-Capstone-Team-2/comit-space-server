@@ -12,8 +12,8 @@ INSERT INTO study_entity (
     id, title, image_src, start_time, end_time, description, is_recruiting, semester, year, tags,
     created_date, modified_date, user_id, day, level, campus
 ) VALUES
-      (1, '스프링1', 'study1.jpg', '09:00', '16:00', '아오 힘들어', true, 'Spring', 2024, '["java", "spring", "jpa"]', NOW(), NOW(), 2, '월', '중급', '율전'),
-      (2, '스프링2', 'study2.jpg', '09:00', '16:00', '아오 힘들어', true, 'Spring', 2024, '["java", "spring", "jpa"]', NOW(), NOW(), 3, '토', '중급', '율전');
+      (1, '스프링1', 'https://liztsvbqxdaijwkmvbka.supabase.co/storage/v1/object/public/Comit-Static/image/study1748756535884-cute_cat.webp', '09:00', '16:00', '아오 힘들어', true, 'Spring', 2024, '["java", "spring", "jpa"]', NOW(), NOW(), 2, '월', '중급', '율전'),
+      (2, '스프링2', 'https://liztsvbqxdaijwkmvbka.supabase.co/storage/v1/object/public/Comit-Static/image/study1748756535884-cute_cat.webp', '09:00', '16:00', '아오 힘들어', true, 'Spring', 2024, '["java", "spring", "jpa"]', NOW(), NOW(), 3, '토', '중급', '율전');
 
 -- Created Study 데이터
 INSERT INTO created_study_entity (
@@ -28,8 +28,8 @@ INSERT INTO event_entity (
     id, title, image_src, start_date,end_date, start_time, end_time, description, is_recruiting, semester, year, tags,
     created_date, modified_date, location
 ) VALUES
-      (1, 'COMIT 해커톤', 'event1.jpg', '2025-06-01','2025-06-05', '10:00','18:00', 'COMIT 연합 해커톤', true, 'Spring', 2024, '["Hackathon", "Programming"]', NOW(), NOW(), '성균관대학교 수원캠퍼스'),
-      (2, 'COMIT 정기 세미나', 'event2.jpg', '2025-07-20','2025-07-20','14:00', '16:00', '월간 정기 세미나', false, 'Spring', 2024, '["Seminar", "Tech"]', NOW(), NOW(), '성균관대학교 서울캠퍼스');
+      (1, 'COMIT 해커톤', 'https://liztsvbqxdaijwkmvbka.supabase.co/storage/v1/object/public/Comit-Static/image/study1748756535884-cute_cat.webp', '2025-06-01','2025-06-05', '10:00','18:00', 'COMIT 연합 해커톤', true, 'Spring', 2024, '["Hackathon", "Programming"]', NOW(), NOW(), '성균관대학교 수원캠퍼스'),
+      (2, 'COMIT 정기 세미나', 'https://liztsvbqxdaijwkmvbka.supabase.co/storage/v1/object/public/Comit-Static/image/study1748756535884-cute_cat.webp', '2025-07-20','2025-07-20','14:00', '16:00', '월간 정기 세미나', false, 'Spring', 2024, '["Seminar", "Tech"]', NOW(), NOW(), '성균관대학교 서울캠퍼스');
 
 -- Created Event 데이터
 INSERT INTO created_event_entity (
@@ -43,8 +43,8 @@ INSERT INTO created_event_entity (
 INSERT INTO post_entity (
     id, group_id, group_type, user_id, title, content, image_src, like_count, created_date, modified_date
 ) VALUES
-      (1, 1, 'STUDY', 2, 'Spring Boot 스터디 1주차 정리', '오늘은 환경 세팅 공부했습니다.', 'post1.jpg', 5, NOW(), NOW()),
-      (2, 1, 'EVENT', 3, '해커톤 참가 신청', 'COMIT 해커톤에 참가하고 싶으신 분들...', 'post2.jpg', 10, NOW(), NOW());
+      (1, 1, 'STUDY', 2, 'Spring Boot 스터디 1주차 정리', '오늘은 환경 세팅 공부했습니다.', 'https://liztsvbqxdaijwkmvbka.supabase.co/storage/v1/object/public/Comit-Static/image/study1748756535884-cute_cat.webp', 5, NOW(), NOW()),
+      (2, 1, 'EVENT', 3, '해커톤 참가 신청', 'COMIT 해커톤에 참가하고 싶으신 분들...', 'https://liztsvbqxdaijwkmvbka.supabase.co/storage/v1/object/public/Comit-Static/image/study1748756535884-cute_cat.webp', 10, NOW(), NOW());
 
 -- Comment 데이터
 INSERT INTO comment_entity (
