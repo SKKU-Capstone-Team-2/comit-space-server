@@ -1,9 +1,7 @@
 package com.example.comitserver.controller;
 
-import com.example.comitserver.dto.CustomUserDetails;
-import com.example.comitserver.dto.StudyResponseDTO;
-import com.example.comitserver.dto.UserRequestDTO;
-import com.example.comitserver.dto.UserResponseDTO;
+import com.example.comitserver.dto.*;
+import com.example.comitserver.entity.EventEntity;
 import com.example.comitserver.entity.StudyEntity;
 import com.example.comitserver.entity.UserEntity;
 import com.example.comitserver.service.UserService;
@@ -72,11 +70,27 @@ public class UserController {
         }
     }
 
-    @GetMapping("/profile/studies-created")
-    public ResponseEntity<?> createStudy(@AuthenticationPrincipal UserDetails userDetails) {
+    @GetMapping("/profile/created-studies")
+    public ResponseEntity<?> getCreatedStudy(@AuthenticationPrincipal UserDetails userDetails) {
         Long userId = ((CustomUserDetails) userDetails).getUserId();
         List<StudyEntity> createdStudies = userService.getCreatedStudies(userId);
         List<StudyResponseDTO> studyDTOs = createdStudies.stream().map(entity -> modelMapper.map(entity, StudyResponseDTO.class)).toList();
         return ResponseUtil.createSuccessResponse(studyDTOs, HttpStatus.OK);
+    }
+
+    @GetMapping("/profile/joined-studies")
+    public ResponseEntity<?> getJoinedStudy(@AuthenticationPrincipal UserDetails userDetails) {
+        Long userId = ((CustomUserDetails) userDetails).getUserId();
+        List<StudyEntity> joinedStudies = userService.getJoinedStudies(userId);
+        List<StudyResponseDTO> studyDTOs = joinedStudies.stream().map(entity -> modelMapper.map(entity, StudyResponseDTO.class)).toList();
+        return ResponseUtil.createSuccessResponse(studyDTOs, HttpStatus.OK);
+    }
+
+    @GetMapping("/profile/joined-events")
+    public ResponseEntity<?> getJoinedEvent(@AuthenticationPrincipal UserDetails userDetails) {
+        Long userId = ((CustomUserDetails) userDetails).getUserId();
+        List<EventEntity> joinedEvents = userService.getJoinedEvents(userId);
+        List<EventResponseDTO> eventDTOs = joinedEvents.stream().map(entity -> modelMapper.map(entity, EventResponseDTO.class)).toList();
+        return ResponseUtil.createSuccessResponse(eventDTOs, HttpStatus.OK);
     }
 }

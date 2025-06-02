@@ -1,11 +1,11 @@
 package com.example.comitserver.service;
 
 import com.example.comitserver.dto.UserRequestDTO;
-import com.example.comitserver.entity.CreatedStudyEntity;
-import com.example.comitserver.entity.StudyEntity;
-import com.example.comitserver.entity.UserEntity;
+import com.example.comitserver.entity.*;
+import com.example.comitserver.entity.enumeration.JoinState;
 import com.example.comitserver.exception.DuplicateResourceException;
 import com.example.comitserver.exception.ResourceNotFoundException;
+import com.example.comitserver.repository.CreatedEventRepository;
 import com.example.comitserver.repository.CreatedStudyRepository;
 import com.example.comitserver.repository.UserRepository;
 import jakarta.validation.Valid;
@@ -21,11 +21,13 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final CreatedStudyRepository createdStudyRepository;
+    private final CreatedEventRepository createdEventRepository;
 
     @Autowired
-    public UserService(UserRepository userRepository, CreatedStudyRepository createdStudyRepository) {
+    public UserService(UserRepository userRepository, CreatedStudyRepository createdStudyRepository, CreatedEventRepository createdEventRepository) {
         this.userRepository = userRepository;
         this.createdStudyRepository = createdStudyRepository;
+        this.createdEventRepository = createdEventRepository;
     }
 
     public List<UserEntity> getAllUsersByStaffStatus(Boolean isStaff) {
@@ -102,11 +104,31 @@ public class UserService {
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("User not found with id: " + userId));
 
-        List<CreatedStudyEntity> createdStudies = createdStudyRepository.findByUser(user);
+        List<CreatedStudyEntity> createdStudies = createdStudyRepository.findByUserIdAndIsLeader(userId,true);
 
         // Extract and return the list of StudyEntity objects from CreatedStudyEntity
         return createdStudies.stream()
                 .map(CreatedStudyEntity::getStudy)
+                .collect(Collectors.toList());
+    }
+
+    public List<StudyEntity> getJoinedStudies(Long userId) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("User not found with id: " + userId));
+
+        List<CreatedStudyEntity> joinedStudies = createdStudyRepository.findByUserIdAndStateAndIsLeader(userId, JoinState.Accept, false);
+        return joinedStudies.stream()
+                .map(CreatedStudyEntity::getStudy)
+                .collect(Collectors.toList());
+    }
+
+    public List<EventEntity> getJoinedEvents(Long userId) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("User not found with id: " + userId));
+
+        List<CreatedEventEntity> joinedEvents = createdEventRepository.findByUserIdAndState(userId, JoinState.Accept);
+        return joinedEvents.stream()
+                .map(CreatedEventEntity::getEvent)
                 .collect(Collectors.toList());
     }
 }
