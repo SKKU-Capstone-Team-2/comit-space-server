@@ -126,6 +126,19 @@ public class StudyService {
         createdStudyRepository.delete(createdStudy);
     }
 
+    public boolean isDuplicateStudy(StudyRequestDTO dto, CustomUserDetails customUserDetails) {
+        UserEntity mentor = userRepository.findById(customUserDetails.getUserId())
+                .orElseThrow(() -> new NoSuchElementException("User not found with id: " + customUserDetails.getUserId()));
+
+        return studyRepository.existsByMentorAndDayAndStartTimeAndEndTime(
+                mentor,
+                dto.getDay(),
+                dto.getStartTime(),
+                dto.getEndTime()
+        );
+    }
+
+
 
     private void fillStudyFields(StudyEntity study, StudyRequestDTO dto) {
         // Fill in all study fields except for mentor
