@@ -23,4 +23,5 @@ public interface CreatedStudyRepository extends JpaRepository<CreatedStudyEntity
     List<CreatedStudyEntity> findByStudyIdAndState(Long studyId, JoinState state);
     List<CreatedStudyEntity> findByUserIdAndStateAndIsLeader(Long userId, JoinState state, boolean isLeader);
     List<CreatedStudyEntity> findByUserIdAndIsLeader(Long userId, boolean isLeader);
+    boolean existsByStudyIdAndUserIdAndState(Long studyId, Long userId, JoinState state);
 }

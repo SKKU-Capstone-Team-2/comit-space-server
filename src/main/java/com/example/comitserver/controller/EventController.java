@@ -66,6 +66,16 @@ public class EventController {
         //return ResponseEntity.ok(modelMapper.map(study, StudyResponseDTO.class));
     }
 
+    @GetMapping("/events/{id}/isJoined")
+    public ResponseEntity<ServerResponseDTO> getEventIsJoined(@PathVariable Long id, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        if (eventRepository.findById(id).isEmpty()) return ResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND, "Event/CannotFindId", "event with that id not found");
+
+        boolean isJoined = createdEventRepository.existsByEventIdAndUserIdAndState(id,customUserDetails.getUserId(),JoinState.Accept);
+
+        return ResponseUtil.createSuccessResponse(isJoined, HttpStatus.OK);
+
+    }
+
     @PostMapping("/events")
     public ResponseEntity<ServerResponseDTO> postEvent(@RequestBody EventRequestDTO eventRequestDTO, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
 
