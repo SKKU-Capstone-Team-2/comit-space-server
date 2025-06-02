@@ -181,6 +181,16 @@ public class StudyController {
 
     }
 
+    @GetMapping("/studies/{id}/isJoined")
+    public ResponseEntity<ServerResponseDTO> getStudyIsJoined(@PathVariable Long id, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        if (studyRepository.findById(id).isEmpty()) return ResponseUtil.createErrorResponse(HttpStatus.NOT_FOUND, "Study/CannotFindId", "study with that id not found");
+
+        boolean isJoined = createdStudyRepository.existsByStudyIdAndUserIdAndState(id,customUserDetails.getUserId(),JoinState.Accept);
+
+        return ResponseUtil.createSuccessResponse(isJoined, HttpStatus.OK);
+
+    }
+
     @PatchMapping("/studies/{id}/{memberId}")
     public ResponseEntity<ServerResponseDTO> patchState(@PathVariable Long id, @PathVariable Long memberId, @RequestBody Map<String, String> body, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         // 요청한 사람이 만든 스터디가 아니면 에러
