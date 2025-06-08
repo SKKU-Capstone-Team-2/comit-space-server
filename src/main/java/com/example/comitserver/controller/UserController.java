@@ -1,6 +1,7 @@
 package com.example.comitserver.controller;
 
 import com.example.comitserver.dto.*;
+import com.example.comitserver.entity.CreatedStudyEntity;
 import com.example.comitserver.entity.EventEntity;
 import com.example.comitserver.entity.StudyEntity;
 import com.example.comitserver.entity.UserEntity;
@@ -81,8 +82,15 @@ public class UserController {
     @GetMapping("/profile/joined-studies")
     public ResponseEntity<?> getJoinedStudy(@AuthenticationPrincipal UserDetails userDetails) {
         Long userId = ((CustomUserDetails) userDetails).getUserId();
-        List<StudyEntity> joinedStudies = userService.getJoinedStudies(userId);
-        List<StudyResponseDTO> studyDTOs = joinedStudies.stream().map(entity -> modelMapper.map(entity, StudyResponseDTO.class)).toList();
+        List<CreatedStudyEntity> joinedStudies = userService.getJoinedStudies(userId);
+
+        List<StudyWithStateResponseDTO> studyDTOs = joinedStudies.stream().map(joinedStudy -> {
+            StudyResponseDTO studyDTO = modelMapper.map(joinedStudy.getStudy(), StudyResponseDTO.class);
+            StudyWithStateResponseDTO dto = new StudyWithStateResponseDTO();
+            dto.setStudy(studyDTO);
+            dto.setState(joinedStudy.getState().toString());
+            return dto;
+        }).toList();
         return ResponseUtil.createSuccessResponse(studyDTOs, HttpStatus.OK);
     }
 
