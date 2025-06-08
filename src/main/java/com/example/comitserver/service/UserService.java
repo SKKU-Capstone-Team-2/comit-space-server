@@ -119,13 +119,10 @@ public class UserService {
         return createdStudyRepository.findByUserIdAndIsLeader(userId, false);
     }
 
-    public List<EventEntity> getJoinedEvents(Long userId) {
+    public List<CreatedEventEntity> getJoinedEvents(Long userId) {
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("User not found with id: " + userId));
 
-        List<CreatedEventEntity> joinedEvents = createdEventRepository.findByUserIdAndState(userId, JoinState.Accept);
-        return joinedEvents.stream()
-                .map(CreatedEventEntity::getEvent)
-                .collect(Collectors.toList());
+        return createdEventRepository.findByUserId(userId);
     }
 }
