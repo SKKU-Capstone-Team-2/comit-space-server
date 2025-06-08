@@ -1,10 +1,7 @@
 package com.example.comitserver.controller;
 
 import com.example.comitserver.dto.*;
-import com.example.comitserver.entity.CreatedStudyEntity;
-import com.example.comitserver.entity.EventEntity;
-import com.example.comitserver.entity.StudyEntity;
-import com.example.comitserver.entity.UserEntity;
+import com.example.comitserver.entity.*;
 import com.example.comitserver.service.UserService;
 import com.example.comitserver.utils.ResponseUtil;
 import jakarta.validation.Valid;
@@ -97,8 +94,15 @@ public class UserController {
     @GetMapping("/profile/joined-events")
     public ResponseEntity<?> getJoinedEvent(@AuthenticationPrincipal UserDetails userDetails) {
         Long userId = ((CustomUserDetails) userDetails).getUserId();
-        List<EventEntity> joinedEvents = userService.getJoinedEvents(userId);
-        List<EventResponseDTO> eventDTOs = joinedEvents.stream().map(entity -> modelMapper.map(entity, EventResponseDTO.class)).toList();
+        List<CreatedEventEntity> joinedEvents = userService.getJoinedEvents(userId);
+
+        List<EventWithStateResponseDTO> eventDTOs = joinedEvents.stream().map(joinedEvent -> {
+            EventResponseDTO eventDTO = modelMapper.map(joinedEvent.getEvent(), EventResponseDTO.class);
+            EventWithStateResponseDTO dto = new EventWithStateResponseDTO();
+            dto.setEvent(eventDTO);
+            dto.setState(joinedEvent.getState().toString());
+            return dto;
+        }).toList();
         return ResponseUtil.createSuccessResponse(eventDTOs, HttpStatus.OK);
     }
 }

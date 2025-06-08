@@ -11,6 +11,7 @@ import java.util.Optional;
 
 public interface CreatedEventRepository extends JpaRepository<CreatedEventEntity, Long> {
     List<CreatedEventEntity> findByUser(UserEntity user);
+    List<CreatedEventEntity> findByUserId(Long userId);
     void deleteAllByEventId(Long eventId);
 
     void deleteByEventId(Long eventId);
