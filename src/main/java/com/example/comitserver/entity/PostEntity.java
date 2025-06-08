@@ -35,6 +35,7 @@ public class PostEntity extends BaseTimeEntity {
     private String title;
 
     @Column(nullable = false, columnDefinition = "LONGTEXT")
+    @Lob
     private String content;
 
     @Column
