@@ -235,7 +235,4 @@ public class StudyController {
         }
     }
 
-
-
-
 }
