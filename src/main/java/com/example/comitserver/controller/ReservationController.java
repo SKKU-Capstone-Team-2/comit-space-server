@@ -92,4 +92,44 @@ public class ReservationController {
             return ResponseUtil.createErrorResponse(HttpStatus.BAD_REQUEST, "reservation/error", e.getMessage());
         }
     }
+
+    // 예약 승인
+    @PatchMapping("/reservations/{id}/accept")
+    public ResponseEntity<ServerResponseDTO> acceptReservation(
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        try {
+            if (!userDetails.isStaff()) {
+                return ResponseUtil.createErrorResponse(HttpStatus.FORBIDDEN, "Reservation/NotStaff", "The user is not a staff member");
+            }
+            ReservationResponseDTO dto = reservationService.acceptReservation(id);
+            return ResponseUtil.createSuccessResponse(dto, HttpStatus.OK);
+        } catch (SecurityException e) {
+            return ResponseUtil.createErrorResponse(HttpStatus.FORBIDDEN, "Reservation/PermissionDenied", e.getMessage());
+        } catch (IllegalStateException e) {
+            return ResponseUtil.createErrorResponse(HttpStatus.CONFLICT, "Reservation/Conflict", e.getMessage());
+        } catch (Exception e) {
+            return ResponseUtil.createErrorResponse(HttpStatus.BAD_REQUEST, "Reservation/Error", e.getMessage());
+        }
+    }
+
+    // 예약 거절
+    @PatchMapping("/reservations/{id}/reject")
+    public ResponseEntity<ServerResponseDTO> rejectReservation(
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        try {
+            if (!userDetails.isStaff()) {
+                return ResponseUtil.createErrorResponse(HttpStatus.FORBIDDEN, "Reservation/NotStaff", "The user is not a staff member");
+            }
+            ReservationResponseDTO dto = reservationService.rejectReservation(id);
+            return ResponseUtil.createSuccessResponse(dto, HttpStatus.OK);
+        } catch (SecurityException e) {
+            return ResponseUtil.createErrorResponse(HttpStatus.FORBIDDEN, "Reservation/PermissionDenied", e.getMessage());
+        } catch (IllegalStateException e) {
+            return ResponseUtil.createErrorResponse(HttpStatus.CONFLICT, "Reservation/Conflict", e.getMessage());
+        } catch (Exception e) {
+            return ResponseUtil.createErrorResponse(HttpStatus.BAD_REQUEST, "Reservation/Error", e.getMessage());
+        }
+    }
 } 
