@@ -131,6 +131,14 @@ public class ReservationService {
         return toResponseDTO(saved);
     }
 
+    // 대기 중인 예약 조회
+    public List<ReservationResponseDTO> getWaitingReservations() {
+        List<ReservationEntity> waitingReservations = reservationRepository.findByIsVerified(Verification.WAIT);
+        return waitingReservations.stream()
+                .map(this::toResponseDTO)
+                .collect(Collectors.toList());
+    }
+
     // Entity -> ResponseDTO 변환
     private ReservationResponseDTO toResponseDTO(ReservationEntity entity) {
         ReservationResponseDTO dto = modelMapper.map(entity, ReservationResponseDTO.class);

@@ -132,4 +132,19 @@ public class ReservationController {
             return ResponseUtil.createErrorResponse(HttpStatus.BAD_REQUEST, "Reservation/Error", e.getMessage());
         }
     }
+
+    // 대기 중인 예약 조회 (스태프용)
+    @GetMapping("/reservations/waiting")
+    public ResponseEntity<ServerResponseDTO> getWaitingReservations(
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        try {
+            if (!userDetails.isStaff()) {
+                return ResponseUtil.createErrorResponse(HttpStatus.FORBIDDEN, "Reservation/NotStaff", "The user is not a staff member");
+            }
+            List<ReservationResponseDTO> waitingReservations = reservationService.getWaitingReservations();
+            return ResponseUtil.createSuccessResponse(waitingReservations, HttpStatus.OK);
+        } catch (Exception e) {
+            return ResponseUtil.createErrorResponse(HttpStatus.BAD_REQUEST, "Reservation/Error", e.getMessage());
+        }
+    }
 } 
