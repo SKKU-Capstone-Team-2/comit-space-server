@@ -135,4 +135,20 @@ public class PostController {
             return ResponseUtil.createErrorResponse(HttpStatus.FORBIDDEN, "Post/PermissionDenied", "the user does not have permission to delete this post");
         }
     }
+
+    @PostMapping("/posts/{id}/like")
+    public ResponseEntity<ServerResponseDTO> likePost(@PathVariable Long id,
+                                                      @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        PostEntity updatedPost = postService.incrementLike(id, customUserDetails);
+        return ResponseUtil.createSuccessResponse(modelMapper.map(updatedPost, PostLikeDTO.class), HttpStatus.OK);
+    }
+
+    @PostMapping("/posts/{id}/unlike")
+    public ResponseEntity<ServerResponseDTO> unlikePost(@PathVariable Long id,
+                                                        @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        PostEntity updatedPost = postService.decrementLike(id, customUserDetails);
+        return ResponseUtil.createSuccessResponse(modelMapper.map(updatedPost, PostLikeDTO.class), HttpStatus.OK);
+    }
+
+
 }
