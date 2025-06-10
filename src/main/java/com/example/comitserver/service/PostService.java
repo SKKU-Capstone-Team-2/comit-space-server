@@ -97,4 +97,28 @@ public class PostService {
         return false;
     }
 
+    @Transactional
+    public PostEntity incrementLike(Long id, CustomUserDetails customUserDetails) {
+        UserEntity author = userRepository.findById(customUserDetails.getUserId())
+                .orElseThrow(()-> new NoSuchElementException("User not found with id: " + customUserDetails.getUserId()));
+        PostEntity post = showPost(id);
+        post.setLikeCount(post.getLikeCount() + 1);
+        postRepository.save(post);
+        return post;
+    }
+
+    @Transactional
+    public PostEntity decrementLike(Long id, CustomUserDetails customUserDetails) {
+        UserEntity author = userRepository.findById(customUserDetails.getUserId())
+                .orElseThrow(()-> new NoSuchElementException("User not found with id: " + customUserDetails.getUserId()));
+        PostEntity post = showPost( id);
+
+        // 좋아요가 0 이하로 내려가지 않도록 체크
+        if (post.getLikeCount() > 0) {
+            post.setLikeCount(post.getLikeCount() - 1);
+        }
+        postRepository.save(post);
+        return post;
+    }
+
 }
