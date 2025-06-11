@@ -34,7 +34,7 @@ public abstract class GroupBaseEntity extends BaseTimeEntity {
     @Column(nullable = false)
     private String endTime;
 
-    @Column(nullable = false, columnDefinition = "LONGTEXT")
+    @Column(nullable = false, columnDefinition = "TEXT")
     @Lob
     protected String description;
 
