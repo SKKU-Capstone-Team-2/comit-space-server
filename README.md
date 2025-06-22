@@ -21,7 +21,7 @@ Follow these steps to get the backend server up and running:
 
 ```bash
 git clone <your-repository-url>
-cd comitserver  # Or your project's root directory name
+cd comit-space-server  # Or your project's root directory name
 ```
 
 ### Build and Run the Application (using Gradle Wrapper)
